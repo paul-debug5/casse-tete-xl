@@ -1,0 +1,2625 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Puzzles de pavage chronométrés de 9 à 12 pièces : 100 formes, défi du jour, sprint.">
+<meta name="theme-color" content="#fbfcfe" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1b2321" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Casse-tête">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Casse-tête XL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Recursive:wght,CASL,MONO@300..1000,0..1,0..1&display=swap">
+<style>
+/* Mise en page : un cahier à petits carreaux (ardoise en sombre). Bandeau titre + réglages, barre chrono + actions,
+   puis la table de jeu : la forme à remplir à gauche, la réserve de pièces à droite (empilées sur mobile). */
+:root {
+  --paper: #fbfcfe;
+  --grid: rgba(56, 104, 190, 0.10);
+  --ink: #1b2947;
+  --ink-2: #58637c;
+  --rule: rgba(27, 41, 71, 0.15);
+  --accent: #2a52c4;
+  --accent-ink: #ffffff;
+  --margin: #dc4258;
+  --hl: rgba(246, 199, 40, 0.5);
+  --well: #e4eaf4;
+  --well-line: rgba(27, 41, 71, 0.10);
+  --card: #ffffff;
+  --card-rule: rgba(56, 104, 190, 0.16);
+  --ok: #1d8a4b;
+  --shade: rgba(27, 41, 71, 0.26);
+  --gloss: #ffffff;
+  --piece-edge: rgba(14, 22, 40, 0.6);
+  --seam: rgba(255, 255, 255, 0.36);
+  --p0: #e5484d; --p1: #f08a24; --p2: #f2c12e; --p3: #3e9b52;
+  --p4: #0fa3b1; --p5: #3d63dd; --p6: #8b4fc6; --p7: #d6409f;
+  --p8: #9b6b43; --p9: #7cb342; --p10: #66758c;
+  --star: #eda200;
+  --f-display: "Recursive", ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "Recursive", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1b2321; --grid: rgba(210, 230, 218, 0.055); --ink: #e8ede7; --ink-2: #a0aba5;
+    --rule: rgba(232, 237, 231, 0.15); --accent: #8eb1ff; --accent-ink: #0f1a2b; --margin: #ff7b88;
+    --hl: rgba(247, 207, 74, 0.32); --well: #28312e; --well-line: rgba(232, 237, 231, 0.08);
+    --card: #222b28; --card-rule: rgba(210, 230, 218, 0.09); --ok: #5ccf86; --shade: rgba(0, 0, 0, 0.5);
+    --gloss: #ffffff; --piece-edge: rgba(6, 10, 9, 0.78); --seam: rgba(255, 255, 255, 0.26);
+    --p0: #ff6166; --p1: #ff9d45; --p2: #f7cf4a; --p3: #55bd6a; --p4: #2ac1cc; --p5: #6b8cff; --p6: #a874e8; --p7: #f062b7;
+    --p8: #c3905f; --p9: #9ccf5a; --p10: #8b9ab0; --star: #f7cf4a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1b2321; --grid: rgba(210, 230, 218, 0.055); --ink: #e8ede7; --ink-2: #a0aba5;
+  --rule: rgba(232, 237, 231, 0.15); --accent: #8eb1ff; --accent-ink: #0f1a2b; --margin: #ff7b88;
+  --hl: rgba(247, 207, 74, 0.32); --well: #28312e; --well-line: rgba(232, 237, 231, 0.08);
+  --card: #222b28; --card-rule: rgba(210, 230, 218, 0.09); --ok: #5ccf86; --shade: rgba(0, 0, 0, 0.5);
+  --gloss: #ffffff; --piece-edge: rgba(6, 10, 9, 0.78); --seam: rgba(255, 255, 255, 0.26);
+  --p0: #ff6166; --p1: #ff9d45; --p2: #f7cf4a; --p3: #55bd6a; --p4: #2ac1cc; --p5: #6b8cff; --p6: #a874e8; --p7: #f062b7;
+  --p8: #c3905f; --p9: #9ccf5a; --p10: #8b9ab0; --star: #f7cf4a;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { height: 100%; }
+body {
+  height: 100%;
+  margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.app {
+  position: relative;
+  height: 100%;
+  min-height: 540px;
+  max-width: 1360px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Bandeau ---------- */
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 24px;
+  padding-block: 14px 10px;
+}
+.title {
+  margin: 0;
+  font-family: var(--f-display);
+  font-variation-settings: "CASL" 1, "MONO" 0;
+  font-weight: 850;
+  font-size: clamp(1.45rem, 1.1rem + 1.4vw, 2.15rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.title mark {
+  color: inherit;
+  background: linear-gradient(transparent 56%, var(--hl) 56%, var(--hl) 92%, transparent 92%);
+  padding: 0 0.06em;
+}
+.tagline, .eyebrow, .zone-label, .clock-meta, .records {
+  font-family: var(--f-mono);
+  font-variation-settings: "MONO" 1, "CASL" 0;
+}
+.tagline {
+  margin: 6px 0 0;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.settings { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg {
+  display: inline-flex;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--card);
+  overflow: hidden;
+}
+.seg button {
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 7px 13px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.seg button + button { border-left: 1.5px solid var(--ink); }
+.seg button:hover { background: var(--well); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); font-weight: 700; }
+
+/* ---------- Chrono + actions ---------- */
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 20px;
+  padding-block: 10px 12px;
+  border-top: 1.5px solid var(--rule);
+}
+.clock { flex: 1 1 240px; max-width: 540px; min-width: 0; display: grid; gap: 7px; }
+.clock-row { display: flex; align-items: baseline; gap: 14px; min-width: 0; }
+.time {
+  font-family: var(--f-mono);
+  font-variation-settings: "MONO" 1, "CASL" 0.7;
+  font-weight: 760;
+  font-size: clamp(2rem, 1.5rem + 1.8vw, 2.9rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.time.is-low { color: var(--margin); }
+.time.is-critical { animation: blink 1s steps(2, jump-none) infinite; }
+@keyframes blink { 50% { opacity: 0.35; } }
+.clock-meta {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  min-width: 0;
+}
+.sand { height: 6px; border-radius: 3px; background: var(--well); overflow: hidden; }
+.sand span { display: block; height: 100%; background: var(--accent); transform-origin: 0 50%; }
+.sand.is-low span { background: var(--margin); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn {
+  font-family: var(--f-body);
+  font-weight: 700;
+  font-size: 0.86rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:hover:not(:disabled) { background: var(--well); }
+.btn:disabled { opacity: 0.38; cursor: default; }
+.btn small {
+  font-family: var(--f-mono);
+  font-variation-settings: "MONO" 1;
+  font-weight: 500;
+  font-size: 0.72rem;
+  color: var(--ink-2);
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.08); }
+.btn svg {
+  width: 18px; height: 18px; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+button:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Table de jeu ---------- */
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 320px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.table { position: absolute; inset: 0; transition: filter 0.25s, opacity 0.25s; }
+.table.is-veiled { filter: blur(7px); opacity: 0.55; }
+.board { position: absolute; left: 0; top: 0; overflow: visible; }
+.board .shadow { fill: var(--rule); }
+.board .cell { fill: var(--well); shape-rendering: crispEdges; }
+.board .check { fill: var(--ink); fill-opacity: 0.035; shape-rendering: crispEdges; }
+.board .seams { fill: none; stroke: var(--well-line); stroke-width: 1; }
+.board .ghost { fill-opacity: 0.42; shape-rendering: crispEdges; }
+.board .ghost-edge { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; shape-rendering: crispEdges; }
+.board .edge { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: square; transition: stroke 0.3s; }
+.board.is-solved .edge { stroke: var(--ok); }
+.zone-label {
+  position: absolute;
+  left: 0; top: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.tray {
+  position: absolute;
+  left: 0; top: 0;
+  border: 1.5px dashed var(--rule);
+  border-radius: 6px;
+}
+.tray .zone-label { left: 10px; top: 7px; }
+.pieces { position: absolute; inset: 0; pointer-events: none; }
+.piece {
+  position: absolute;
+  left: 0; top: 0;
+  z-index: 3;
+  transform-origin: 0 0;
+  will-change: transform;
+  transition: transform 0.2s cubic-bezier(0.2, 0.75, 0.25, 1), filter 0.15s;
+}
+.piece svg { display: block; width: 100%; height: 100%; overflow: visible; transform-origin: 50% 50%; }
+.piece .pf { fill: var(--pc); shape-rendering: crispEdges; }
+.piece .pg { fill: url(#gloss); shape-rendering: crispEdges; }
+.piece .ps { fill: none; stroke: var(--seam); stroke-width: 0.035; }
+.piece .po { fill: none; stroke: var(--piece-edge); stroke-width: 0.06; stroke-linecap: square; }
+.piece.is-placed { z-index: 2; }
+.piece.is-flying { z-index: 6; }
+.piece.is-dragging { z-index: 9; transition: none; filter: drop-shadow(0 14px 12px var(--shade)); }
+.piece.is-dragging .po { stroke: var(--accent); stroke-width: 0.09; }
+.piece.is-dragging.can-drop .po { stroke: var(--ok); }
+.stage.is-grab { cursor: grab; }
+.no-anim .piece { transition: none !important; }
+.piece.bump svg { animation: bump 0.22s ease-out; }
+.piece.pop svg { animation: pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+.piece.enter svg { animation: enter 0.32s ease-out both; }
+.piece.hinted svg { animation: hinted 1.2s ease-out; }
+.piece.bad svg { animation: shake 0.42s ease; }
+@keyframes bump { from { transform: scale(1.07); } to { transform: scale(1); } }
+@keyframes pop { 35% { transform: scale(1.1); } 100% { transform: scale(1); } }
+@keyframes enter { from { opacity: 0; transform: scale(0.82); } to { opacity: 1; transform: scale(1); } }
+@keyframes hinted { 25% { filter: drop-shadow(0 0 7px var(--accent)); transform: scale(1.06); } 100% { filter: none; transform: scale(1); } }
+@keyframes shake { 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+
+/* ---------- Fiche (carte de départ / résultat) ---------- */
+.overlay {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+.overlay.is-bottom { align-items: flex-end; }
+.overlay[hidden] { display: none; }
+.card {
+  width: min(440px, 100%);
+  background-color: var(--card);
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 22px 44px -22px var(--shade);
+  animation: cardIn 0.26s ease-out both;
+}
+@keyframes cardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.card-head { padding: 13px 20px 9px; border-bottom: 2px solid var(--margin); }
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.card-body {
+  padding: 0 20px;
+  line-height: 26px;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 25px, var(--card-rule) 25px 26px);
+}
+.card-body > * { margin: 0; }
+.card h2 {
+  font-family: var(--f-display);
+  font-variation-settings: "CASL" 1, "MONO" 0;
+  font-weight: 760;
+  font-size: 1.28rem;
+  line-height: 26px;
+  padding-top: 13px;
+  padding-bottom: 13px;
+  text-wrap: balance;
+}
+.card p { max-width: 62ch; }
+.card .muted { color: var(--ink-2); }
+.howto { list-style: none; padding: 0; }
+.howto li { padding-left: 16px; position: relative; }
+.howto li::before { content: ""; position: absolute; left: 2px; top: 11px; width: 6px; height: 6px; border-radius: 1px; background: var(--ink-2); }
+kbd {
+  font-family: var(--f-mono);
+  font-variation-settings: "MONO" 1;
+  font-size: 0.76rem;
+  padding: 1px 6px;
+  border: 1px solid var(--rule);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.result { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 16px; padding-top: 4px; }
+.big {
+  font-family: var(--f-display);
+  font-variation-settings: "CASL" 1, "MONO" 1;
+  font-weight: 850;
+  font-size: 3.1rem;
+  line-height: 78px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.big small { font-family: var(--f-body); font-weight: 700; font-size: 1rem; letter-spacing: 0; margin-left: 6px; color: var(--ink-2); }
+.stamp {
+  font-family: var(--f-mono);
+  font-variation-settings: "MONO" 1, "CASL" 1;
+  font-weight: 800;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--margin);
+  border: 2px solid var(--margin);
+  border-radius: 4px;
+  padding: 2px 9px;
+  transform: rotate(-7deg);
+}
+.card-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 16px 20px 18px; }
+.hint-key { font-size: 0.8rem; color: var(--ink-2); }
+
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 30;
+  max-width: calc(100% - 24px);
+  transform: translate(-50%, 10px);
+  opacity: 0;
+  pointer-events: none;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.86rem;
+  font-weight: 700;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Menu des niveaux ---------- */
+.menu {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+.menu-inner { display: grid; gap: 24px; padding-block: 14px 28px; border-top: 1.5px solid var(--rule); }
+.menu-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 32px; }
+.menu-intro { display: grid; gap: 7px; max-width: 64ch; min-width: 0; }
+.menu-title {
+  margin: 0;
+  font-family: var(--f-display);
+  font-variation-settings: "CASL" 1, "MONO" 0;
+  font-weight: 800;
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.7rem);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.menu-sub { margin: 0; color: var(--ink-2); }
+.menu-rule, .chapter-meta {
+  font-family: var(--f-mono);
+  font-variation-settings: "MONO" 1, "CASL" 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.menu-rule { margin: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.menu-rule > span { display: inline-flex; align-items: center; gap: 7px; }
+.menu-score { display: grid; gap: 7px; flex: 0 1 260px; min-width: 190px; }
+.menu-count {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-variation-settings: "MONO" 1, "CASL" 0.7;
+  font-weight: 760;
+  font-size: 2.3rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.menu-count small { margin-left: 6px; font-family: var(--f-body); font-weight: 700; font-size: 0.9rem; letter-spacing: 0; color: var(--ink-2); }
+.menu-starcount { margin: 0; font-size: 0.86rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.menu-sync { margin: 0; display: flex; align-items: center; gap: 7px; font-size: 0.78rem; color: var(--ink-2); }
+.menu-sync::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--rule); }
+.menu-sync.is-ok::before { background: var(--ok); }
+.menu-sync.is-warn::before { background: var(--margin); }
+.menu-code { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 0.78rem; color: var(--ink-2); }
+.linkbtn {
+  font: inherit; font-weight: 700; color: var(--accent);
+  background: none; border: 0; padding: 2px 0; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.code-input {
+  flex-basis: 100%; width: 100%; min-height: 84px; resize: vertical;
+  font-family: var(--f-mono); font-variation-settings: "MONO" 1; font-size: 0.74rem; line-height: 1.4;
+  padding: 8px 10px; color: var(--ink); background: var(--paper);
+  border: 1.5px solid var(--rule); border-radius: var(--radius);
+  word-break: break-all;
+}
+.code-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.chapters { display: grid; gap: 26px; }
+.chapter { display: grid; gap: 10px; }
+.chapter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 16px;
+  padding-bottom: 6px;
+  border-bottom: 1.5px dashed var(--rule);
+}
+.chapter-head h3 {
+  margin: 0;
+  font-family: var(--f-display);
+  font-variation-settings: "CASL" 1, "MONO" 0;
+  font-weight: 760;
+  font-size: 1.05rem;
+}
+.chapter-meta { margin: 0; text-transform: uppercase; letter-spacing: 0.06em; }
+.tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 1000px) { .tiles { grid-template-columns: repeat(10, minmax(0, 1fr)); } }
+.tile {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  justify-items: center;
+  gap: 5px;
+  aspect-ratio: 4 / 5;
+  min-width: 0;
+  padding: 7px 6px 8px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--card);
+  border: 1.5px solid var(--rule);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.tile:hover:not(:disabled) { border-color: var(--ink); transform: translateY(-2px); }
+.tile.is-next { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.tile.is-locked { background: transparent; border-style: dashed; cursor: default; }
+.tile-n {
+  justify-self: start;
+  font-family: var(--f-mono);
+  font-variation-settings: "MONO" 1;
+  font-weight: 700;
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.tile.is-next .tile-n { color: var(--accent); }
+.tile-art { display: block; width: 100%; height: 100%; min-height: 0; }
+.tile-art .sil { fill: var(--ink-2); opacity: 0.45; }
+.tile.is-next .tile-art .sil { fill: var(--accent); opacity: 0.6; }
+.tile.is-locked .tile-art .sil { fill: var(--rule); opacity: 1; }
+.tile-lock {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 13px; height: 13px;
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.tile-stars { min-height: 12px; }
+.tile-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.7rem;
+  line-height: 1.15;
+  color: var(--ink-2);
+}
+.stars { display: inline-flex; gap: 2px; vertical-align: middle; }
+.star { display: block; width: 12px; height: 12px; flex: none; overflow: visible; }
+.star path { stroke-linejoin: round; }
+.star.on path { fill: var(--star); stroke: var(--star); stroke-width: 1; }
+.star.off path { fill: none; stroke: var(--ink-2); stroke-width: 1.7; opacity: 0.45; }
+.stars.md .star { width: 16px; height: 16px; }
+.stars.lg { gap: 6px; }
+.stars.lg .star { width: 30px; height: 30px; }
+.stars.lg .star.on { animation: starIn 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+.stars.lg .star:nth-child(2) { animation-delay: 0.14s; }
+.stars.lg .star:nth-child(3) { animation-delay: 0.28s; }
+@keyframes starIn { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: none; } }
+.card .star-line { height: 52px; display: flex; align-items: center; }
+.goals { list-style: none; padding: 0; }
+.goals li { display: flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
+.foot-row { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 0.84rem; color: var(--ink-2); }
+.seg-dur button { padding: 5px 11px; font-size: 0.84rem; }
+
+/* ---------- Outils du menu : défi du jour + progression ---------- */
+.menu-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 20px; align-items: stretch; }
+.daily {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 16px;
+  padding: 12px 16px;
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  background: var(--card);
+  min-width: 0;
+}
+.daily-art { width: 64px; height: 52px; }
+.daily-art .sil { fill: var(--accent); opacity: 0.55; }
+.daily-art path[style] { opacity: 0.9; }
+.daily-text { display: grid; gap: 2px; min-width: 0; }
+.daily-text h3 { margin: 0; font-family: var(--f-display); font-variation-settings: "CASL" 1, "MONO" 0; font-weight: 760; font-size: 1.02rem; }
+.daily-text p { margin: 0; font-size: 0.84rem; color: var(--ink-2); }
+.daily-text p b { color: var(--ink); }
+.menu-side { display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 0.84rem; color: var(--ink-2); cursor: pointer; }
+.toggle input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+.progress { display: grid; gap: 18px; padding: 16px 18px 18px; border: 1.5px dashed var(--rule); border-radius: 6px; }
+.progress[hidden] { display: none; }
+.progress-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.progress-head h3 { margin: 0; font-family: var(--f-display); font-variation-settings: "CASL" 1, "MONO" 0; font-weight: 760; font-size: 1.05rem; }
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px 18px; }
+.stat { display: grid; gap: 2px; min-width: 0; }
+.stat b { font-family: var(--f-mono); font-variation-settings: "MONO" 1, "CASL" 0.7; font-weight: 760; font-size: 1.5rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 0.76rem; color: var(--ink-2); }
+.chart-wrap { display: grid; gap: 6px; }
+.chart-title { margin: 0; font-size: 0.84rem; color: var(--ink-2); }
+.chart { display: block; width: 100%; height: auto; max-width: 720px; }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .band { fill: var(--ok); fill-opacity: 0.07; }
+.chart .band2 { fill: var(--star); fill-opacity: 0.08; }
+.chart .line { fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .pt { stroke: var(--card); stroke-width: 2; }
+.chart .pt.s3 { fill: var(--ok); }
+.chart .pt.s2 { fill: var(--star); }
+.chart .pt.s1 { fill: var(--ink-2); }
+.chart .pt.s0 { fill: var(--margin); }
+.chart text { font-family: var(--f-mono); font-variation-settings: "MONO" 1; font-size: 10px; fill: var(--ink-2); }
+.chart .empty { font-family: var(--f-body); font-size: 12px; }
+.redo { display: flex; flex-wrap: wrap; gap: 8px; }
+.redo-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: inherit; font-size: 0.82rem; font-weight: 700; color: var(--ink);
+  padding: 6px 10px; border: 1.5px solid var(--rule); border-radius: var(--radius); background: var(--card); cursor: pointer;
+}
+.redo-btn:hover { border-color: var(--ink); }
+.redo-btn small { font-family: var(--f-mono); font-variation-settings: "MONO" 1; font-weight: 500; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.stamp.is-clean { color: var(--accent); border-color: var(--accent); transform: rotate(3deg); }
+@media (max-width: 760px) {
+  .menu-tools { grid-template-columns: minmax(0, 1fr); }
+  .menu-side { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .daily { grid-template-columns: auto minmax(0, 1fr); }
+  .daily .btn { grid-column: 1 / -1; justify-content: center; }
+}
+
+/* ---------- Pied ---------- */
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 20px;
+  padding-block: 9px 12px;
+  border-top: 1.5px solid var(--rule);
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+.foot p { margin: 0; min-width: 0; }
+.records { font-size: 0.74rem; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* Marge rouge du cahier, sur grand écran */
+@media (min-width: 900px) {
+  body { padding-left: max(72px, env(safe-area-inset-left, 0px)); }
+  .app::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: -22px;
+    width: 2px;
+    background: var(--margin);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+@media (max-width: 640px) {
+  .tagline { display: none; }
+  .top { padding-block: 10px 8px; gap: 8px; }
+  .seg button { padding: 6px 10px; font-size: 0.84rem; }
+  .hud { padding-block: 8px 10px; gap: 8px 12px; align-items: center; }
+  .clock { flex-basis: 150px; }
+  .clock-row { gap: 10px; }
+  .clock-meta { font-size: 0.64rem; line-height: 1.25; }
+  .actions { gap: 6px; }
+  .actions .btn .lbl { display: none; }
+  .actions .btn { width: 38px; padding: 0; justify-content: center; }
+  .keys { display: none; }
+}
+@media (max-width: 640px) {
+  .tiles { gap: 8px; }
+  .tile { aspect-ratio: 5 / 6; padding: 6px 4px 7px; gap: 4px; }
+  .tile-name { display: none; }
+  .star { width: 10px; height: 10px; }
+  .progress { padding: 12px; }
+  .stat b { font-size: 1.25rem; }
+  .menu-count { font-size: 1.9rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .piece, .table, .toast, .board .edge, .tile { transition: none !important; }
+  .piece svg, .card, .time, .stars .star { animation: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand">
+      <h1 class="title">Casse-tête <mark>XL</mark></h1>
+      <p class="tagline">100 formes de 9 à 12 pièces · Défi du jour · Sprint</p>
+    </div>
+    <div class="settings">
+      <div class="seg" role="group" aria-label="Mode de jeu">
+        <button type="button" id="mode-niveaux" data-mode="niveaux" aria-pressed="true">Niveaux</button>
+        <button type="button" id="mode-sprint" data-mode="sprint" aria-pressed="false">Sprint</button>
+      </div>
+      <div class="seg" id="levelSeg" role="group" aria-label="Nombre de pièces du sprint" hidden>
+        <button type="button" id="level-facile" data-level="facile" aria-pressed="false">9 pièces</button>
+        <button type="button" id="level-moyen" data-level="moyen" aria-pressed="true">10 pièces</button>
+        <button type="button" id="level-difficile" data-level="difficile" aria-pressed="false">11 pièces</button>
+        <button type="button" id="level-xl" data-level="xl" aria-pressed="false">12 pièces</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hud" id="hud" aria-label="Chrono et actions" hidden>
+    <div class="clock">
+      <div class="clock-row">
+        <span class="time" id="time">5:00</span>
+        <span class="clock-meta" id="clockMeta">Niveau 1/50</span>
+      </div>
+      <div class="sand" id="sand" aria-hidden="true"><span id="sandFill"></span></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn" id="btnHint" title="Indice (H) : coûte 30 s" aria-label="Indice, coûte 30 secondes (H)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 18.5h5M10.5 21.4h3"/><path d="M12 2.8a6.2 6.2 0 0 0-3.7 11.2c.8.6 1.2 1.4 1.2 2.4h5c0-1 .4-1.8 1.2-2.4A6.2 6.2 0 0 0 12 2.8z"/></svg>
+        <span class="lbl">Indice <small>−30&#8239;s</small></span>
+      </button>
+      <button type="button" class="btn" id="btnClear" title="Tout retirer (X)" aria-label="Retirer toutes les pièces posées (X)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></svg>
+        <span class="lbl">Tout retirer</span>
+      </button>
+      <button type="button" class="btn" id="btnGiveUp">
+        <span id="giveUpIcon"></span>
+        <span class="lbl" id="giveUpLbl">Solution</span>
+      </button>
+      <button type="button" class="btn" id="btnNew">
+        <span id="newIcon"></span>
+        <span class="lbl" id="newLbl">Nouveau</span>
+      </button>
+    </div>
+  </section>
+
+  <main class="stage" id="stage" aria-label="Plateau de jeu">
+    <div class="table" id="table" hidden>
+      <svg class="board" id="board" aria-hidden="true"></svg>
+      <div class="zone-label" id="boardLabel"></div>
+      <div class="tray" id="tray"><span class="zone-label" id="trayLabel">Réserve</span></div>
+      <div class="pieces" id="pieces"></div>
+    </div>
+    <section class="menu" id="menu" aria-label="Les 100 niveaux">
+      <div class="menu-inner">
+        <header class="menu-head">
+          <div class="menu-intro">
+            <h2 class="menu-title">Les 100 formes</h2>
+            <p class="menu-sub">9 à 11 pièces jusqu'au niveau 50, puis 11 et 12 pièces. Orientation fixe, sans montée progressive. Une forme réussie avant la fin des 5 minutes débloque la suivante, et les étoiles récompensent la vitesse.</p>
+            <p class="menu-rule" id="menuRule"></p>
+          </div>
+          <div class="menu-score">
+            <p class="menu-count"><span id="menuDone">0</span><small>/ <span id="menuTotal">100</span> formes réussies</small></p>
+            <div class="sand" aria-hidden="true"><span id="menuBar"></span></div>
+            <p class="menu-starcount"><span id="menuStars">0</span> / <span id="menuStarsTotal">300</span> étoiles</p>
+            <p class="menu-sync" id="menuSync" role="status">Connexion à ta sauvegarde…</p>
+            <p class="menu-code"><span>Code de sauvegarde :</span><button type="button" class="linkbtn" id="btnCopyCode">Copier</button><span aria-hidden="true">·</span><button type="button" class="linkbtn" id="btnRestoreCode">Restaurer</button></p>
+          </div>
+        </header>
+        <div class="menu-tools">
+          <div class="daily" id="daily">
+            <svg class="daily-art" id="dailyArt" viewBox="0 0 10 8" aria-hidden="true"></svg>
+            <div class="daily-text">
+              <h3 id="dailyTitle">Défi du jour</h3>
+              <p id="dailyText">12 pièces, une forme différente chaque jour, la même pour tout le monde.</p>
+            </div>
+            <button type="button" class="btn primary" id="btnDaily">Jouer</button>
+          </div>
+          <div class="menu-side">
+            <button type="button" class="btn" id="btnProgress" aria-expanded="false" aria-controls="progress">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M5 15l4-5 4 3 6-8"/></svg>
+              <span>Progression</span>
+            </button>
+            <label class="toggle"><input type="checkbox" id="noHint"> Mode sans indice</label>
+          </div>
+        </div>
+        <section class="progress" id="progress" hidden aria-label="Progression"></section>
+        <div class="chapters" id="chapters"></div>
+      </div>
+    </section>
+    <div class="overlay" id="overlay" hidden>
+      <div class="card" id="card" role="dialog" aria-labelledby="cardTitle"></div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <footer class="foot">
+    <p class="records" id="records"></p>
+    <p class="keys" id="keys"></p>
+  </footer>
+</div>
+
+<svg class="defs" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color: var(--gloss); stop-opacity: 0.32"/>
+      <stop offset="0.55" style="stop-color: var(--gloss); stop-opacity: 0"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<script>
+(() => {
+'use strict';
+/* ===== Moteur : bibliothèque de polyominos, générateur de formes, solveur ===== */
+const LIB = [
+  { key: 'I3', name: 'I', size: 3, cells: [[0,0],[0,1],[0,2]] },
+  { key: 'V3', name: 'V', size: 3, cells: [[0,0],[1,0],[1,1]] },
+  { key: 'I4', name: 'I', size: 4, cells: [[0,0],[0,1],[0,2],[0,3]] },
+  { key: 'O4', name: 'O', size: 4, cells: [[0,0],[0,1],[1,0],[1,1]] },
+  { key: 'T4', name: 'T', size: 4, cells: [[0,0],[0,1],[0,2],[1,1]] },
+  { key: 'S4', name: 'S', size: 4, cells: [[0,1],[0,2],[1,0],[1,1]] },
+  { key: 'L4', name: 'L', size: 4, cells: [[0,0],[1,0],[2,0],[2,1]] },
+  { key: 'F5', name: 'F', size: 5, cells: [[0,1],[0,2],[1,0],[1,1],[2,1]] },
+  { key: 'I5', name: 'I', size: 5, cells: [[0,0],[0,1],[0,2],[0,3],[0,4]] },
+  { key: 'L5', name: 'L', size: 5, cells: [[0,0],[1,0],[2,0],[3,0],[3,1]] },
+  { key: 'N5', name: 'N', size: 5, cells: [[0,1],[1,1],[2,0],[2,1],[3,0]] },
+  { key: 'P5', name: 'P', size: 5, cells: [[0,0],[0,1],[1,0],[1,1],[2,0]] },
+  { key: 'T5', name: 'T', size: 5, cells: [[0,0],[0,1],[0,2],[1,1],[2,1]] },
+  { key: 'U5', name: 'U', size: 5, cells: [[0,0],[0,2],[1,0],[1,1],[1,2]] },
+  { key: 'V5', name: 'V', size: 5, cells: [[0,0],[1,0],[2,0],[2,1],[2,2]] },
+  { key: 'W5', name: 'W', size: 5, cells: [[0,0],[1,0],[1,1],[2,1],[2,2]] },
+  { key: 'X5', name: 'X', size: 5, cells: [[0,1],[1,0],[1,1],[1,2],[2,1]] },
+  { key: 'Y5', name: 'Y', size: 5, cells: [[0,1],[1,0],[1,1],[2,1],[3,1]] },
+  { key: 'Z5', name: 'Z', size: 5, cells: [[0,0],[0,1],[1,1],[2,1],[2,2]] },
+];
+const LIB_BY_KEY = Object.fromEntries(LIB.map(p => [p.key, p]));
+
+const LEVELS = {
+  facile:    { label: '9 pièces',  sizes: [5,5,5,5,5,5,4,4,4],       W: 8, H: 7, wContact: 1.0, wBox: 0.25, noise: 1.8, maxSol: 60, minFill: 0.6 },
+  moyen:     { label: '10 pièces', sizes: [5,5,5,5,5,5,5,4,4,4],     W: 9, H: 7, wContact: 1.0, wBox: 0.26, noise: 1.8, maxSol: 60, minFill: 0.6 },
+  difficile: { label: '11 pièces', sizes: [5,5,5,5,5,5,5,5,4,4,4],   W: 9, H: 8, wContact: 1.0, wBox: 0.27, noise: 1.7, maxSol: 60, minFill: 0.6 },
+  xl:        { label: '12 pièces', sizes: [5,5,5,5,5,5,5,5,5,4,4,4], W: 10, H: 8, wContact: 1.0, wBox: 0.27, noise: 1.7, maxSol: 60, minFill: 0.6 },
+};
+
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function shuffle(arr, rnd) {
+  for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+  return arr;
+}
+
+/* Miroir horizontal d'abord (c → −c), puis rotation horaire rot fois ((r,c) → (c,−r)).
+   L'ordre des cases est conservé : out[i] correspond à cells[i]. */
+function transform(cells, rot, flip) {
+  let out = cells.map(([r, c]) => (flip ? [r, -c] : [r, c]));
+  for (let k = 0; k < rot; k++) out = out.map(([r, c]) => [c, -r]);
+  let mr = Infinity, mc = Infinity;
+  for (const [r, c] of out) { if (r < mr) mr = r; if (c < mc) mc = c; }
+  return out.map(([r, c]) => [r - mr, c - mc]);
+}
+function cellsKey(cells) {
+  return cells.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(p => p[0] + ',' + p[1]).join(';');
+}
+const ORIENT_CACHE = {};
+function orientationsOf(key) {
+  if (ORIENT_CACHE[key]) return ORIENT_CACHE[key];
+  const base = LIB_BY_KEY[key].cells;
+  const seen = new Set(); const out = [];
+  for (let flip = 0; flip < 2; flip++) for (let rot = 0; rot < 4; rot++) {
+    const cells = transform(base, rot, flip);
+    const k = cellsKey(cells);
+    if (seen.has(k)) continue; seen.add(k);
+    const sorted = cells.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    let h = 0, w = 0; for (const [r, c] of sorted) { if (r + 1 > h) h = r + 1; if (c + 1 > w) w = c + 1; }
+    out.push({ rot, flip, key: k, cells: sorted, first: sorted[0], h, w });
+  }
+  return (ORIENT_CACHE[key] = out);
+}
+
+/* Cases vides enfermées (trous) : remplissage depuis le bord du cadre. */
+function hasHole(occ, W, H) {
+  const seen = new Uint8Array(W * H); const stack = [];
+  for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) {
+    if ((r === 0 || c === 0 || r === H - 1 || c === W - 1) && occ[r * W + c] < 0) { seen[r * W + c] = 1; stack.push(r * W + c); }
+  }
+  while (stack.length) {
+    const i = stack.pop(); const r = (i / W) | 0, c = i % W;
+    const nb = [];
+    if (r > 0) nb.push(i - W); if (r < H - 1) nb.push(i + W); if (c > 0) nb.push(i - 1); if (c < W - 1) nb.push(i + 1);
+    for (const j of nb) if (!seen[j] && occ[j] < 0) { seen[j] = 1; stack.push(j); }
+  }
+  for (let i = 0; i < W * H; i++) if (occ[i] < 0 && !seen[i]) return true;
+  return false;
+}
+
+function tryBuild(cfg, rnd) {
+  const W = cfg.W, H = cfg.H;
+  const bySize = {};
+  for (const p of LIB) (bySize[p.size] = bySize[p.size] || []).push(p);
+  const counts = {};
+  for (const s of cfg.sizes) counts[s] = (counts[s] || 0) + 1;
+  let chosen = [];
+  for (const s of Object.keys(counts)) chosen.push(...shuffle(bySize[s].slice(), rnd).slice(0, counts[s]));
+  chosen = shuffle(chosen, rnd);
+  chosen.sort((a, b) => b.size - a.size);
+
+  const occ = new Int16Array(W * H).fill(-1);
+  const placed = [];
+  let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+  for (let k = 0; k < chosen.length; k++) {
+    const piece = chosen[k];
+    let best = null, bestScore = -Infinity;
+    for (const o of orientationsOf(piece.key)) {
+      for (let ar = 0; ar + o.h <= H; ar++) for (let ac = 0; ac + o.w <= W; ac++) {
+        let ok = true;
+        for (const [r, c] of o.cells) if (occ[(ar + r) * W + ac + c] !== -1) { ok = false; break; }
+        if (!ok) continue;
+        let score;
+        if (k === 0) {
+          const cy = ar + o.h / 2, cx = ac + o.w / 2;
+          score = -Math.hypot(cy - H / 2, cx - W / 2) + rnd() * 1.5;
+        } else {
+          let contacts = 0;
+          for (const [r, c] of o.cells) {
+            const rr = ar + r, cc = ac + c;
+            if (rr > 0 && occ[(rr - 1) * W + cc] >= 0) contacts++;
+            if (rr < H - 1 && occ[(rr + 1) * W + cc] >= 0) contacts++;
+            if (cc > 0 && occ[rr * W + cc - 1] >= 0) contacts++;
+            if (cc < W - 1 && occ[rr * W + cc + 1] >= 0) contacts++;
+          }
+          if (contacts === 0) continue;
+          const nMinR = Math.min(minR, ar), nMaxR = Math.max(maxR, ar + o.h - 1);
+          const nMinC = Math.min(minC, ac), nMaxC = Math.max(maxC, ac + o.w - 1);
+          const box = (nMaxR - nMinR + 1) * (nMaxC - nMinC + 1);
+          score = contacts * cfg.wContact - box * cfg.wBox + rnd() * cfg.noise;
+        }
+        if (score <= bestScore) continue;
+        for (const [r, c] of o.cells) occ[(ar + r) * W + ac + c] = k;
+        const holed = hasHole(occ, W, H);
+        for (const [r, c] of o.cells) occ[(ar + r) * W + ac + c] = -1;
+        if (holed) continue;
+        bestScore = score; best = { o, ar, ac };
+      }
+    }
+    if (!best) return null;
+    for (const [r, c] of best.o.cells) occ[(best.ar + r) * W + best.ac + c] = k;
+    placed.push({ key: piece.key, rot: best.o.rot, flip: best.o.flip, ar: best.ar, ac: best.ac });
+    minR = Math.min(minR, best.ar); maxR = Math.max(maxR, best.ar + best.o.h - 1);
+    minC = Math.min(minC, best.ac); maxC = Math.max(maxC, best.ac + best.o.w - 1);
+  }
+  // recadrage
+  const RW = maxC - minC + 1, RH = maxR - minR + 1;
+  const region = new Uint8Array(RW * RH);
+  for (let r = 0; r < RH; r++) for (let c = 0; c < RW; c++) region[r * RW + c] = occ[(r + minR) * W + c + minC] >= 0 ? 1 : 0;
+  const pieces = chosen.map(p => p.key);
+  const solution = placed.map((p, i) => ({ piece: i, rot: p.rot, flip: p.flip, ar: p.ar - minR, ac: p.ac - minC }));
+  // orientation figée : chaque pièce n'existe que dans la position utilisée pour construire la forme
+  const lockedKeys = solution.map(s => transformKey(pieces[s.piece], s.rot, s.flip));
+  return { W: RW, H: RH, region, pieces, solution, locked: true, lockedKeys };
+}
+
+/* Solveur par couverture exacte : la première case vide (ordre de lecture) est forcément
+   la première case de la pièce qui la couvre. fixed : {pieceIndex: {ar, ac, key}} */
+function solve(puzzle, fixed, opts) {
+  const { W, H, region, pieces } = puzzle;
+  const cap = (opts && opts.cap) || 1;
+  const nodeLimit = (opts && opts.nodeLimit) || 3e6;
+  const N = W * H;
+  const occ = new Int16Array(N);
+  for (let i = 0; i < N; i++) occ[i] = region[i] ? -1 : -2;
+  const used = new Uint8Array(pieces.length);
+  const cur = [];
+  if (fixed) {
+    for (const idx of Object.keys(fixed)) {
+      const f = fixed[idx]; const i = +idx;
+      const o = orientationsOf(pieces[i]).find(x => x.key === f.key);
+      if (!o) return { count: 0, solutions: [] };
+      for (const [r, c] of o.cells) {
+        const rr = f.ar + r, cc = f.ac + c;
+        if (rr < 0 || cc < 0 || rr >= H || cc >= W || occ[rr * W + cc] !== -1) return { count: 0, solutions: [] };
+        occ[rr * W + cc] = i;
+      }
+      used[i] = 1;
+      cur.push({ piece: i, rot: o.rot, flip: o.flip, key: o.key, ar: f.ar, ac: f.ac });
+    }
+  }
+  const orients = pieces.map((k, i) => {
+    const all = orientationsOf(k);
+    if (!puzzle.locked) return all;
+    const o = all.find(x => x.key === puzzle.lockedKeys[i]);
+    return o ? [o] : all;
+  });
+  const sizes = pieces.map(k => LIB_BY_KEY[k].size);
+  let count = 0, nodes = 0, aborted = false;
+  const solutions = [];
+  function minRemaining() { let m = Infinity; for (let i = 0; i < pieces.length; i++) if (!used[i] && sizes[i] < m) m = sizes[i]; return m; }
+  // élagage : chaque poche vide doit pouvoir accueillir au moins la plus petite pièce restante
+  const mark = new Int32Array(N); let stamp = 0; const stack = [];
+  function pocketsOk() {
+    const m = minRemaining(); if (m === Infinity) return true;
+    stamp++;
+    for (let s = 0; s < N; s++) {
+      if (occ[s] !== -1 || mark[s] === stamp) continue;
+      let size = 0; stack.length = 0; stack.push(s); mark[s] = stamp;
+      while (stack.length) {
+        const i = stack.pop(); size++;
+        const r = (i / W) | 0, c = i % W;
+        if (r > 0 && occ[i - W] === -1 && mark[i - W] !== stamp) { mark[i - W] = stamp; stack.push(i - W); }
+        if (r < H - 1 && occ[i + W] === -1 && mark[i + W] !== stamp) { mark[i + W] = stamp; stack.push(i + W); }
+        if (c > 0 && occ[i - 1] === -1 && mark[i - 1] !== stamp) { mark[i - 1] = stamp; stack.push(i - 1); }
+        if (c < W - 1 && occ[i + 1] === -1 && mark[i + 1] !== stamp) { mark[i + 1] = stamp; stack.push(i + 1); }
+      }
+      if (size < m) return false;
+    }
+    return true;
+  }
+  function search(start) {
+    if (++nodes > nodeLimit) { aborted = true; return true; }
+    let i = start; while (i < N && occ[i] !== -1) i++;
+    if (i === N) {
+      count++;
+      if (solutions.length < 1) solutions.push(cur.slice());
+      return count >= cap;
+    }
+    const er = (i / W) | 0, ec = i % W;
+    for (let p = 0; p < pieces.length; p++) {
+      if (used[p]) continue;
+      used[p] = 1;
+      for (const o of orients[p]) {
+        const ar = er - o.first[0], ac = ec - o.first[1];
+        let ok = true;
+        for (const [r, c] of o.cells) {
+          const rr = ar + r, cc = ac + c;
+          if (rr < 0 || cc < 0 || rr >= H || cc >= W || occ[rr * W + cc] !== -1) { ok = false; break; }
+        }
+        if (!ok) continue;
+        for (const [r, c] of o.cells) occ[(ar + r) * W + ac + c] = p;
+        cur.push({ piece: p, rot: o.rot, flip: o.flip, key: o.key, ar, ac });
+        if (pocketsOk() && search(i + 1)) { if (aborted || count >= cap) return true; }
+        cur.pop();
+        for (const [r, c] of o.cells) occ[(ar + r) * W + ac + c] = -1;
+      }
+      used[p] = 0;
+    }
+    return false;
+  }
+  if (pocketsOk()) search(0);
+  return { count, solutions, nodes, aborted };
+}
+
+function generatePuzzle(levelKey, seed) {
+  const cfg = LEVELS[levelKey];
+  const rnd = mulberry32((seed * 2654435761) >>> 0 ^ levelKey.length * 7919);
+  let last = null;
+  for (let attempt = 0; attempt < 300; attempt++) {
+    const res = tryBuild(cfg, rnd);
+    if (!res) continue;
+    last = res;
+    let area = 0; for (const v of res.region) area += v;
+    const fill = area / (res.W * res.H);
+    if (fill < cfg.minFill) continue;
+    if (cfg.maxSol < Infinity) {
+      const s = solve(res, null, { cap: cfg.maxSol + 1, nodeLimit: 4e5 });
+      if (s.aborted || s.count > cfg.maxSol) continue;
+    }
+    res.attempts = attempt + 1;
+    break;
+  }
+  if (!last) return generatePuzzle(levelKey, seed + 1);
+  const P = last;
+  P.level = levelKey; P.seed = seed;
+  // les pièces s'affichent directement dans leur unique orientation
+  P.start = [];
+  for (const s of P.solution) P.start[s.piece] = { rot: s.rot, flip: s.flip };
+  P.trayOrder = shuffle(P.pieces.map((_, i) => i), rnd);
+  P.colors = shuffle([0, 1, 2, 3, 4, 5, 6, 7], rnd).slice(0, P.pieces.length);
+  return P;
+}
+function transformKey(key, rot, flip) { return cellsKey(transform(LIB_BY_KEY[key].cells, rot, flip)); }
+
+
+/* ===== Application ===== */
+const LIMIT_NIV = 300000, HINT_COST = 30000, SKIP_COST = 15000;
+const DURS = [180000, 300000, 600000];
+const PAR3 = 10000, PAR2 = 20000; // étoiles : 10 s et 20 s par pièce
+const CAMPAIGN = [{"n":"","r":"..#..##../#########/#########/#########/#########/.########","p":[["W5",1,0,2,3],["T5",0,0,2,1],["V5",0,0,3,1],["F5",3,1,3,4],["X5",0,0,2,6],["L5",3,0,4,5],["U5",2,0,1,6],["S4",0,0,0,4],["T4",2,0,0,1],["I4",1,0,1,0]]},{"n":"","r":".##.##./..#####/.######/######./#######/#######/#######","p":[["V5",1,0,2,1],["T5",2,0,3,1],["L5",0,0,3,0],["Y5",1,0,5,2],["U5",0,0,3,3],["Z5",1,0,1,4],["O4",0,0,0,4],["T4",1,0,4,5],["S4",0,1,0,1]]},{"n":"","r":"####.#../#######./######../#######./#######./.######./########/.##.####","p":[["X5",0,0,2,2],["Z5",0,1,2,0],["T5",3,0,4,2],["V5",1,0,1,0],["L5",3,1,0,0],["F5",2,1,5,0],["U5",3,0,2,4],["N5",0,0,3,5],["S4",0,1,6,3],["T4",2,0,0,4],["O4",0,0,6,6]]},{"n":"","r":"####.####/#########/.########/#########/########./####...../..#......","p":[["I5",0,0,3,2],["V5",3,0,2,5],["F5",2,0,0,5],["L5",2,0,0,7],["U5",0,0,0,3],["Y5",3,1,1,1],["P5",3,1,0,0],["I4",0,0,4,1],["L4",2,1,3,0],["T4",0,0,5,1]]},{"n":"","r":"...##.../.#.#####/########/########/########/.######./...####.","p":[["U5",1,0,2,3],["Z5",0,0,3,4],["V5",0,0,3,2],["N5",2,1,1,5],["X5",0,0,1,0],["L5",2,0,1,6],["S4",1,0,3,0],["I4",0,0,6,3],["O4",0,0,0,3]]},{"n":"","r":".###..##/.#######/########/.#######/########/#######./########/.....##.","p":[["N5",3,1,3,2],["L5",3,0,4,2],["F5",3,1,2,1],["X5",0,0,0,2],["W5",3,0,0,4],["Z5",0,1,0,0],["Y5",2,0,2,6],["I5",0,0,6,1],["S4",0,0,6,5],["I4",1,0,0,7],["T4",3,0,4,0]]},{"n":"","r":"..##.#./..#####/.######/#######/.######/.######/.#####./.#####./..####.","p":[["L5",0,0,2,3],["P5",2,1,2,4],["I5",1,0,2,2],["F5",1,1,5,3],["U5",0,0,7,3],["N5",0,1,5,1],["X5",0,0,0,4],["I4",1,0,2,6],["O4",0,0,0,2],["T4",1,0,2,0]]},{"n":"","r":"######./#######/#######/.######/.#####./######./.#####.","p":[["P5",2,0,2,3],["X5",0,0,1,1],["N5",3,0,0,1],["V5",0,0,4,2],["Y5",2,1,3,0],["T5",1,0,4,3],["T4",3,0,0,0],["O4",0,0,2,5],["S4",0,1,0,4]]},{"n":"","r":"##.###../########/########/.#######/#######./#######./.######./.###..../..#.....","p":[["Y5",3,1,4,2],["F5",1,0,3,4],["Z5",1,0,2,2],["T5",0,0,2,0],["P5",1,0,2,5],["X5",0,0,0,2],["N5",1,0,0,4],["W5",0,0,4,0],["I4",0,0,6,3],["O4",0,0,0,0],["T4",0,0,7,1]]},{"n":"","r":"..#...##./.#######./.#######./########./#########/.########/..##.#.##","p":[["P5",1,0,2,3],["X5",0,0,2,1],["F5",3,1,0,1],["W5",0,0,3,0],["Z5",0,1,4,2],["V5",2,0,1,4],["L5",2,0,0,6],["I4",0,0,4,5],["T4",0,0,5,4],["O4",0,0,5,7]]},{"n":"","r":".#...##/.###.#./.######/#######/#######/.######/#######/.#####./..##...","p":[["I5",0,0,4,1],["V5",3,0,3,4],["Y5",1,0,2,2],["W5",1,0,2,0],["Z5",1,1,0,1],["U5",1,0,0,5],["N5",3,0,5,1],["T4",0,0,6,0],["S4",0,0,6,4],["O4",0,0,7,2]]},{"n":"","r":".##.###/#######/.######/#######/#######/#######/....###","p":[["T5",3,0,2,3],["X5",0,0,4,3],["U5",3,0,4,5],["Z5",1,1,1,4],["Y5",0,1,0,2],["P5",1,0,0,4],["O4",0,0,4,1],["L4",2,1,3,0],["T4",1,0,0,0]]},{"n":"","r":".####.../.#####../########/########/########/########/.#######/....####","p":[["Y5",2,1,2,3],["N5",2,0,2,2],["Z5",1,0,0,2],["W5",0,0,5,3],["F5",2,1,4,0],["V5",1,0,0,1],["P5",0,0,4,5],["T5",3,0,1,5],["O4",0,0,6,6],["L4",2,0,3,6],["T4",3,0,2,0]]},{"n":"","r":"#########/#########/#########/#########/#.#####../..#####..","p":[["W5",0,0,2,3],["V5",3,0,3,4],["X5",0,0,1,4],["Y5",3,0,0,3],["P5",2,1,3,2],["F5",0,1,0,1],["Z5",0,0,1,6],["S4",1,0,0,0],["T4",3,0,2,0],["L4",2,0,0,7]]},{"n":"","r":".##.../######/######/######/######/######/######/#.###.","p":[["Z5",1,1,2,2],["F5",0,1,4,2],["I5",1,0,2,5],["L5",0,0,2,1],["P5",3,1,1,3],["T5",3,0,5,0],["O4",0,0,0,1],["I4",1,0,1,0],["L4",3,0,6,2]]},{"n":"","r":"..#..##./.#######/########/.#######/########/..####../######../.#####../..####..","p":[["V5",2,0,3,2],["L5",3,1,4,0],["Z5",1,1,5,2],["N5",1,0,6,0],["X5",0,0,1,0],["F5",3,0,0,2],["I5",1,0,3,5],["T5",2,0,0,4],["O4",0,0,3,6],["I4",0,0,8,2],["S4",1,0,0,6]]},{"n":"","r":".######.#/.########/.########/#########/..#######/.########","p":[["N5",3,0,2,3],["W5",2,0,3,3],["U5",3,0,2,6],["Y5",1,0,4,1],["T5",1,0,2,0],["I5",0,0,1,2],["V5",3,0,3,6],["I4",0,0,0,3],["L4",2,1,0,1],["T4",1,0,0,7]]},{"n":"","r":"..#######/.########/#########/..#######/.#######./######.#./##.......","p":[["U5",1,0,2,4],["N5",1,1,2,5],["F5",0,0,3,6],["I5",0,0,1,4],["V5",0,0,3,3],["Z5",0,1,0,2],["W5",3,0,0,0],["I4",0,0,0,5],["T4",1,0,3,1],["O4",0,0,5,0]]},{"n":"","r":"#######./########/#######./########/#######./..##.###","p":[["I5",1,0,0,3],["U5",1,0,0,4],["X5",0,0,0,5],["Y5",1,1,3,4],["N5",1,0,4,4],["F5",2,1,3,1],["T4",3,0,1,1],["L4",3,1,0,0],["I4",1,0,1,0]]},{"n":"","r":"...#..##./...#####./#########/#########/#########/..#######/.######../...####..","p":[["N5",0,1,2,4],["X5",0,0,2,5],["L5",0,0,2,3],["Z5",1,1,0,3],["P5",0,1,0,6],["W5",3,0,4,5],["Y5",3,1,6,3],["T5",2,0,4,1],["O4",0,0,2,1],["L4",0,0,2,0],["I4",1,0,2,8]]},{"n":"","r":"..#..#.#./#########/########./#########/.#######./########./....##.#.","p":[["N5",3,0,2,2],["Y5",3,1,2,0],["T5",1,0,0,3],["X5",0,0,0,6],["Z5",1,0,0,0],["I5",0,0,4,1],["F5",3,0,2,6],["O4",0,0,5,4],["I4",0,0,5,0],["S4",1,0,4,6]]},{"n":"","r":".##.#.#/#######/#######/######./######./#######/#####..","p":[["Y5",1,1,3,2],["Z5",1,1,3,1],["I5",0,0,2,1],["V5",0,0,3,0],["F5",3,1,4,4],["W5",1,0,0,0],["L4",3,0,0,2],["T4",1,0,0,5],["I4",0,0,6,0]]},{"n":"","r":"...#####./########./########./########./.########/#########/##.#..###","p":[["X5",0,0,2,4],["Y5",1,1,1,4],["F5",2,0,1,2],["T5",2,0,2,6],["U5",1,0,2,1],["I5",0,0,0,3],["V5",1,0,1,0],["L5",1,1,4,4],["O4",0,0,5,0],["T4",1,0,4,2],["L4",3,0,5,6]]},{"n":"","r":"##.#.#.../#######.#/#########/########./########./.########/.......##","p":[["Z5",1,0,2,3],["P5",1,1,4,3],["V5",1,0,2,2],["W5",0,0,3,0],["N5",0,1,0,0],["F5",1,0,0,4],["U5",0,0,0,1],["T4",3,0,3,6],["S4",1,1,1,7],["O4",0,0,5,7]]},{"n":"","r":".####../.######/######./######./######./####.../####.#./#.#####/..####.","p":[["Z5",1,0,3,2],["V5",1,0,3,1],["F5",1,1,5,1],["P5",1,1,7,2],["I5",1,0,3,0],["Y5",1,0,1,0],["L5",1,0,0,1],["I4",0,0,1,3],["L4",2,0,2,4],["T4",3,0,6,5]]},{"n":"","r":".#..#.../######.#/########/########/########/.######./...#.##.","p":[["L5",3,0,2,2],["F5",3,1,1,1],["N5",2,0,0,0],["X5",0,0,0,3],["V5",3,0,2,4],["Y5",3,0,4,0],["T4",0,0,5,2],["I4",1,0,1,7],["O4",0,0,5,5]]},{"n":"","r":"..###.##/.#######/#######./######../#######./#######./.#######/..######","p":[["Y5",2,1,2,3],["W5",3,0,2,1],["V5",0,0,3,0],["U5",0,0,5,3],["X5",0,0,1,0],["F5",0,1,1,4],["Z5",0,0,4,5],["P5",3,1,0,2],["O4",0,0,0,6],["S4",0,1,6,1],["I4",0,0,7,4]]},{"n":"","r":".###.../.######/#######/#######/.#####./.#####./######./######./...##..","p":[["F5",1,1,3,2],["I5",1,0,3,5],["U5",0,0,5,2],["Y5",3,0,2,2],["P5",1,0,7,2],["T5",0,0,3,0],["V5",2,0,1,4],["S4",0,0,1,0],["O4",0,0,6,0],["L4",3,1,0,1]]},{"n":"","r":".#.##../#######/#######/#######/#######/#######/..####.","p":[["L5",1,0,3,2],["U5",2,0,4,3],["P5",3,0,4,0],["W5",3,0,1,0],["N5",3,1,1,3],["Y5",1,0,5,2],["I4",1,0,2,6],["O4",0,0,0,3],["S4",1,1,0,0]]},{"n":"","r":"..#.#####/.#######./########./#########/########./########./##..###../#........","p":[["N5",2,1,2,3],["L5",2,0,2,4],["P5",2,1,3,2],["V5",3,0,4,4],["T5",0,0,1,5],["Y5",0,1,2,7],["U5",0,0,0,2],["X5",0,0,1,0],["T4",3,0,3,0],["S4",1,1,5,0],["I4",0,0,0,5]]},{"n":"","r":".####..##/#########/########./#########/########./####.###.","p":[["U5",3,0,2,4],["T5",2,0,1,2],["N5",2,0,1,1],["P5",1,1,4,1],["Z5",1,1,0,4],["X5",0,0,2,6],["I5",1,0,1,0],["O4",0,0,0,7],["T4",2,0,4,5],["L4",1,0,0,1]]},{"n":"","r":"..######./########./.########/.########/.######../########./....###..","p":[["P5",3,1,2,3],["T5",1,0,3,3],["N5",3,0,5,2],["W5",3,0,3,0],["F5",0,1,1,0],["Z5",0,0,1,5],["L5",1,0,0,4],["T4",3,0,4,6],["O4",0,0,0,2],["S4",1,0,1,7]]},{"n":"","r":"..######/..#####./..######/.#######/#######./.#######/..#.#.##","p":[["V5",1,0,2,3],["U5",2,0,3,4],["W5",2,0,1,5],["F5",1,1,4,3],["T5",3,0,0,2],["I5",0,0,0,3],["O4",0,0,5,6],["I4",1,0,3,2],["T4",1,0,3,0]]},{"n":"","r":"..######./..#######/#########/.########/.#######./.########/##.#####.","p":[["L5",1,1,2,2],["N5",1,0,1,2],["V5",2,0,1,4],["F5",2,0,2,6],["U5",2,0,4,3],["Y5",3,1,5,3],["W5",2,0,0,6],["Z5",0,0,2,0],["T4",0,0,5,6],["S4",0,0,5,0],["I4",0,0,0,2]]},{"n":"","r":"...#.#.../########./########./#########/#########/..#######/..##.#.#.","p":[["L5",0,1,2,3],["W5",2,0,2,1],["Z5",0,0,4,1],["I5",1,0,2,5],["T5",1,0,0,1],["Y5",2,0,1,0],["F5",1,0,0,4],["L4",0,1,1,6],["S4",1,0,4,6],["T4",1,0,3,7]]},{"n":"","r":".#######/########/.#######/..######/..######/..######/....#.#.","p":[["X5",0,0,2,2],["P5",0,0,0,2],["Z5",1,1,4,2],["W5",2,0,4,4],["Y5",2,1,1,5],["U5",2,0,0,5],["L4",0,0,0,4],["I4",1,0,2,7],["T4",1,0,0,0]]},{"n":"","r":"...###.../.#.######/#########/.########/..#######/#########/#########","p":[["W5",0,0,3,3],["Y5",2,0,3,2],["I5",0,0,6,3],["T5",1,0,4,6],["V5",0,0,2,5],["P5",3,0,2,6],["X5",0,0,1,0],["L5",3,1,1,5],["S4",1,0,1,3],["O4",0,0,5,0],["T4",0,0,0,3]]},{"n":"","r":".###.##../########./########./#########/#########/########.","p":[["N5",3,1,2,3],["L5",3,0,3,3],["T5",0,0,2,1],["W5",1,0,0,4],["I5",0,0,5,2],["U5",1,0,1,0],["P5",1,0,0,1],["O4",0,0,4,0],["L4",2,0,1,6],["S4",1,1,3,7]]},{"n":"","r":"#######./########/########/########/.######./..#####.","p":[["Z5",0,1,1,2],["F5",2,1,1,4],["Y5",3,1,3,3],["I5",0,0,5,2],["W5",0,0,2,0],["T5",0,0,0,1],["L4",3,1,0,4],["T4",1,0,1,6],["S4",1,0,0,0]]},{"n":"","r":"...####../..#####.#/#######.#/#########/#########/#########/######.#.","p":[["T5",3,0,2,3],["V5",2,0,2,4],["N5",3,1,4,2],["L5",3,0,5,2],["U5",3,0,2,1],["X5",0,0,4,6],["I5",0,0,1,2],["Y5",2,1,1,7],["O4",0,0,5,0],["T4",3,0,2,0],["I4",0,0,0,3]]},{"n":"","r":"..####./#######/######./#######/#######/#######/.######/.######/...##..","p":[["Y5",2,1,2,3],["N5",2,0,0,3],["Z5",0,1,0,1],["X5",0,0,4,1],["W5",1,0,3,0],["U5",0,0,6,1],["F5",2,0,6,3],["L5",2,1,3,5],["L4",2,1,1,0],["T4",3,0,0,5],["I4",1,0,4,6]]},{"n":"","r":"..###../..#####/..#####/#######/#######/######./#######/..####./...###.","p":[["Y5",3,0,3,1],["W5",0,0,3,0],["L5",1,1,5,0],["X5",0,0,3,4],["T5",1,0,1,4],["N5",1,1,1,2],["Z5",0,1,6,4],["S4",1,0,4,3],["T4",0,0,7,2],["L4",1,0,0,2]]},{"n":"","r":"####../#####./####../######/######/######/######/####.#","p":[["F5",3,0,3,1],["I5",1,0,3,0],["V5",0,0,5,1],["Z5",1,1,1,0],["W5",3,0,4,2],["Y5",1,1,1,1],["I4",0,0,0,0],["L4",3,1,3,3],["T4",1,0,5,4]]},{"n":"","r":"###...../#######./.######./########/########/########/########/...##.##","p":[["F5",2,1,2,3],["X5",0,0,2,5],["L5",3,0,4,4],["Y5",1,1,1,3],["Z5",0,1,2,1],["N5",0,0,1,0],["T5",1,0,4,1],["U5",2,0,0,0],["L4",1,1,5,0],["S4",0,0,6,3],["O4",0,0,6,6]]},{"n":"","r":".#.#.#./.######/######./#######/#######/#######/#######/.##.##.","p":[["Y5",1,1,2,2],["Z5",1,1,2,1],["P5",1,1,3,4],["X5",0,0,4,1],["F5",0,0,5,3],["W5",0,0,5,0],["U5",0,0,0,1],["L4",0,0,2,0],["S4",1,1,5,5],["T4",2,0,0,4]]},{"n":"","r":".####../######./######./..####./.######/#######/.####.#/..###.#","p":[["P5",1,1,3,2],["Y5",3,0,2,1],["X5",0,0,4,0],["Z5",1,0,4,3],["U5",0,0,6,2],["W5",1,0,0,0],["S4",0,0,0,2],["I4",1,0,4,6],["L4",2,0,1,4]]},{"n":"","r":"....#####/#########/#########/#########/#########/.########/...##...#","p":[["U5",2,0,2,3],["L5",1,0,1,2],["Y5",1,0,3,2],["Z5",0,0,1,0],["N5",0,1,2,0],["V5",3,0,3,4],["F5",0,1,2,6],["T5",1,0,0,6],["I4",0,0,0,4],["S4",0,1,5,2],["T4",1,0,4,7]]},{"n":"","r":"..#####/..#####/..#####/#.#####/#######/######./.######/.####../..###..","p":[["L5",2,1,2,3],["F5",3,1,2,4],["U5",1,0,4,5],["Y5",0,0,5,3],["V5",2,0,0,4],["P5",2,1,6,2],["N5",1,0,0,2],["L4",2,1,5,1],["I4",1,0,1,2],["T4",3,0,3,0]]},{"n":"","r":"#######./######../#######./#######./.#######/.#######/.#####.#","p":[["Y5",1,1,3,2],["P5",3,0,4,2],["F5",2,0,4,4],["N5",2,1,3,6],["V5",0,0,4,1],["I5",0,0,2,2],["Z5",0,1,1,0],["T4",0,0,0,2],["L4",2,1,0,0],["S4",0,0,0,4]]},{"n":"","r":".##.../######/######/######/######/######/#####./##.###","p":[["Z5",1,1,2,2],["P5",1,0,1,2],["F5",0,1,4,2],["N5",0,1,3,1],["L5",2,1,2,0],["I5",1,0,1,5],["S4",0,0,0,0],["T4",2,0,6,3],["O4",0,0,6,0]]},{"n":"","r":"..##...../.#######./.########/.#######./########./#########/########./.###.....","p":[["U5",0,0,3,3],["Y5",3,0,2,3],["W5",1,0,2,6],["I5",0,0,1,3],["X5",0,0,4,6],["P5",3,0,5,4],["N5",0,1,3,2],["Z5",0,1,2,0],["O4",0,0,5,0],["T4",2,0,6,1],["S4",0,0,0,1]]},{"n":"","r":".###..##../####.###../##########/##########/.#########/.#######../#########.","p":[["I5",0,0,4,3],["L5",3,1,3,5],["W5",3,0,1,3],["V5",2,0,2,7],["X5",0,0,1,1],["U5",1,0,1,0],["P5",0,0,0,6],["F5",3,0,4,2],["T5",2,0,4,0],["L4",3,1,0,1],["S4",0,0,5,4],["T4",2,0,5,6]]},{"n":"","r":".....#.#/.##.####/.#######/########/#######./.######./########/.#######/..######","p":[["L5",3,0,3,2],["I5",0,0,3,0],["U5",3,0,4,0],["Z5",0,1,5,1],["N5",1,1,5,3],["P5",1,1,6,4],["Y5",3,1,7,2],["F5",0,1,2,5],["W5",3,0,0,3],["T4",1,0,0,6],["L4",0,1,6,6],["O4",0,0,1,1]]},{"n":"","r":"..#####../.#######./#########/#########/#########/######.#./######...","p":[["Y5",0,0,2,3],["I5",1,0,2,5],["U5",1,0,2,2],["N5",3,0,5,1],["V5",0,0,4,0],["F5",3,1,0,1],["P5",1,0,0,3],["W5",0,0,0,6],["S4",1,0,2,0],["L4",1,1,2,6],["T4",0,0,4,6]]},{"n":"","r":"....#.##/...####./..#####./..#####./..#####./..######/########/########/########/...#####","p":[["Y5",0,1,3,3],["N5",0,0,5,3],["W5",3,0,7,3],["T5",0,0,3,4],["F5",2,0,4,5],["X5",0,0,0,3],["Z5",0,1,0,5],["L5",2,1,2,2],["V5",3,0,6,0],["S4",1,1,6,6],["O4",0,0,6,0],["L4",3,0,8,5]]},{"n":"","r":"###...##./########./#########/########./.########/.########/..###.###","p":[["T5",1,0,2,3],["F5",3,1,1,2],["L5",1,1,3,1],["W5",1,0,1,0],["V5",2,0,1,4],["X5",0,0,3,6],["Z5",0,0,0,6],["U5",0,0,5,6],["L4",1,0,0,0],["T4",0,0,5,3],["S4",0,1,5,1]]},{"n":"","r":".######./.#######/#######./.######./########/#######./#######./..#.###.","p":[["F5",0,0,2,2],["V5",3,0,3,2],["I5",1,0,2,5],["X5",0,0,3,0],["Z5",1,1,5,0],["L5",1,0,1,2],["N5",1,0,6,3],["Y5",0,1,3,6],["I4",0,0,0,2],["T4",3,0,0,6],["L4",0,1,0,0]]},{"n":"","r":"...#####/########/########/#######./#######./########/.#######/.#######","p":[["Z5",1,0,2,3],["W5",1,0,4,3],["V5",1,0,2,2],["U5",0,0,6,2],["N5",2,0,4,5],["T5",0,0,5,0],["L5",2,1,1,1],["F5",0,1,1,5],["P5",2,0,5,6],["O4",0,0,0,3],["I4",1,0,1,0],["L4",3,1,0,5]]},{"n":"","r":"##...../#######/.######/#######/#######/#######/#######/#######/######./.#.....","p":[["W5",3,0,3,2],["Z5",0,1,3,4],["T5",3,0,1,3],["Y5",0,0,1,1],["P5",0,1,3,0],["V5",3,0,4,4],["L5",1,1,5,0],["I5",0,0,7,0],["N5",3,1,7,3],["L4",3,1,1,4],["T4",0,0,8,0],["O4",0,0,0,0]]},{"n":"","r":"..##...../.#####.../.#######./.########/.#######./.########/.########/#######..","p":[["X5",0,0,2,3],["T5",0,0,2,5],["N5",1,1,1,2],["U5",0,0,4,3],["Z5",0,1,3,6],["V5",0,0,4,2],["L5",3,0,5,5],["Y5",0,1,2,1],["I4",0,0,7,3],["T4",2,0,6,0],["S4",0,0,0,1]]},{"n":"","r":".#######/.######./#######./#######./.#######/..######/..######/.######.","p":[["N5",2,1,2,3],["X5",0,0,3,1],["Z5",0,0,2,4],["V5",2,0,1,4],["F5",0,1,0,1],["I5",0,0,0,3],["P5",2,0,1,0],["T5",1,0,4,5],["T4",2,0,5,2],["O4",0,0,6,5],["I4",0,0,7,1]]},{"n":"","r":"#....##.#/#########/.########/#########/#########/########./########./...##....","p":[["Z5",0,1,2,3],["V5",1,0,1,3],["P5",2,0,2,5],["W5",2,0,0,5],["F5",2,0,3,6],["Y5",3,1,5,4],["U5",1,0,5,3],["I5",1,0,1,2],["T5",2,0,4,0],["L4",2,1,3,0],["I4",1,0,0,8],["S4",1,0,0,0]]},{"n":"","r":"....##.../#..###.#./#########/#########/########./.########/.##.#####/##.....##","p":[["Y5",3,0,3,2],["P5",1,1,4,3],["X5",0,0,3,0],["W5",3,0,5,0],["V5",3,0,4,4],["Z5",0,0,3,6],["T5",3,0,1,0],["F5",1,0,1,6],["O4",0,0,6,7],["L4",3,0,1,3],["S4",0,0,0,3]]},{"n":"","r":".##...##./.#######./#########/########./########./.########/.#...###./.....####","p":[["W5",2,0,2,3],["N5",3,0,3,1],["V5",0,0,2,0],["L5",3,1,1,2],["Y5",2,0,1,6],["X5",0,0,4,6],["U5",1,0,0,1],["Z5",0,0,0,6],["S4",0,1,5,4],["L4",1,0,5,1],["I4",0,0,7,5]]},{"n":"","r":"##......./########./#########/########./#########/#########/########./..####...","p":[["T5",0,0,2,3],["Y5",2,1,3,4],["W5",0,0,5,3],["U5",0,0,3,1],["F5",0,0,1,1],["Z5",0,0,5,1],["L5",0,0,3,0],["P5",0,0,0,0],["V5",2,0,1,4],["L4",2,1,4,6],["T4",3,0,1,7],["S4",1,1,4,7]]},{"n":"","r":".#..###../#######../#######../#########/########./########./########./.#..#####","p":[["V5",0,0,2,3],["T5",1,0,2,4],["W5",3,0,0,4],["L5",3,1,5,3],["N5",3,1,0,2],["P5",1,0,6,3],["Y5",2,1,2,1],["X5",0,0,5,0],["I5",1,0,1,0],["T4",2,0,6,6],["I4",1,0,0,1],["L4",2,1,3,7]]},{"n":"","r":"####.#.../.###.###./.#######./#########/#########/.########/.#####.##/........#","p":[["P5",1,1,3,3],["L5",3,0,4,3],["X5",0,0,2,1],["U5",2,0,1,1],["N5",3,0,2,4],["W5",0,0,3,0],["Z5",1,1,0,5],["I5",0,0,6,1],["S4",1,1,3,7],["I4",0,0,0,0],["T4",1,0,5,7]]},{"n":"","r":"......#./#######./..######/########/.######./########/########/..######/...##...","p":[["Z5",1,1,3,3],["V5",0,0,3,2],["U5",3,0,3,0],["T5",0,0,3,5],["X5",0,0,1,3],["I5",0,0,6,0],["Y5",1,1,1,0],["F5",2,1,0,5],["L4",3,0,5,5],["S4",0,1,7,2],["I4",0,0,7,4]]},{"n":"","r":"....#.###./.#.#######/##########/.########./.#######../########../########../.#...###..","p":[["Z5",0,1,3,4],["L5",0,1,4,5],["U5",3,0,2,3],["N5",1,0,5,2],["W5",1,0,3,1],["F5",3,0,5,0],["X5",0,0,1,0],["I5",1,0,3,7],["T5",2,0,0,5],["T4",2,0,0,3],["O4",0,0,0,7],["S4",1,1,1,8]]},{"n":"","r":"#....#./#######/######./######./######./######./#######/#######/.######/...####","p":[["F5",3,1,3,1],["X5",0,0,5,1],["I5",1,0,3,0],["N5",0,1,0,0],["Z5",1,1,7,1],["W5",2,0,1,1],["V5",3,0,3,3],["T5",0,0,7,3],["L5",2,0,1,3],["O4",0,0,8,5],["L4",3,1,6,4],["T4",3,0,0,5]]},{"n":"","r":".######./..######/.#######/#######./#######./.#######/########/.#...###","p":[["U5",2,0,3,3],["L5",1,1,4,4],["V5",2,0,2,4],["F5",3,1,0,3],["W5",2,0,0,5],["Z5",1,1,5,3],["Y5",2,1,2,1],["X5",0,0,5,0],["T4",0,0,0,1],["S4",1,1,2,0],["O4",0,0,6,6]]},{"n":"","r":"...####../.######../#######../#######.#/#########/#########/########./##.####..","p":[["Y5",0,0,2,4],["U5",1,0,2,3],["I5",1,0,1,6],["P5",3,1,0,4],["V5",0,0,3,2],["F5",1,1,0,1],["T5",3,0,5,1],["L5",2,1,4,0],["W5",3,0,5,5],["S4",0,0,6,3],["O4",0,0,2,0],["T4",1,0,3,7]]},{"n":"","r":".#.##../#######/######./######./.#####./######./.######/######./.######/.######","p":[["L5",2,1,3,2],["Z5",0,1,5,2],["X5",0,0,5,4],["V5",3,0,2,3],["W5",2,0,1,2],["N5",1,0,0,3],["T5",1,0,7,2],["F5",0,0,2,0],["U5",3,0,5,0],["S4",1,1,0,0],["O4",0,0,8,5],["L4",1,1,8,1]]},{"n":"","r":"####..#../#######../########./#########/#########/..#######/..#######","p":[["I5",0,0,3,2],["N5",1,0,1,2],["T5",1,0,0,4],["X5",0,0,1,0],["V5",3,0,2,5],["Z5",1,1,3,0],["L5",1,0,0,0],["W5",2,0,4,3],["O4",0,0,5,6],["I4",1,0,3,8],["T4",2,0,5,2]]},{"n":"","r":"#######./#######./#######./.######./#######./#######./.#######/...##.##","p":[["P5",1,1,3,3],["L5",1,1,4,2],["W5",3,0,1,2],["T5",0,0,0,4],["I5",1,0,1,6],["F5",1,1,0,1],["U5",3,0,2,0],["N5",1,0,5,0],["L4",1,0,0,0],["S4",0,0,6,3],["O4",0,0,6,6]]},{"n":"","r":"...#####../.########./#########./#########./#########./.#########/.########.","p":[["X5",0,0,3,4],["P5",3,1,2,3],["Y5",2,0,2,2],["N5",1,0,5,3],["V5",0,0,4,1],["U5",3,0,3,6],["F5",2,0,4,7],["T5",1,0,1,6],["L5",1,0,1,1],["T4",3,0,2,0],["O4",0,0,0,6],["L4",3,1,0,3]]},{"n":"","r":".###..#.#/.########/#########/#########/.#######./..#######/..#######/...#####.","p":[["F5",2,0,3,3],["L5",2,1,1,3],["N5",1,0,2,4],["X5",0,0,0,5],["W5",1,0,4,5],["V5",0,0,4,2],["Y5",2,1,0,7],["P5",1,1,5,6],["I5",0,0,7,3],["T4",1,0,1,1],["S4",1,0,2,0],["L4",1,0,0,1]]},{"n":"","r":"....####/.#######/.#######/########/########/########/..######/..####..","p":[["F5",3,1,3,3],["Z5",0,1,3,1],["N5",3,1,5,2],["X5",0,0,2,5],["Y5",1,0,1,2],["V5",1,0,1,1],["P5",2,0,4,6],["L5",3,0,6,2],["T4",3,0,3,0],["S4",0,1,0,4],["L4",2,0,0,6]]},{"n":"","r":"..#..####/..##.####/#########/#########/#########/.#######./.#######./###.#.#..","p":[["Y5",3,1,3,3],["I5",0,0,5,3],["N5",3,0,3,5],["X5",0,0,2,1],["U5",1,0,2,0],["V5",2,0,1,6],["W5",0,0,0,2],["Z5",1,1,5,2],["T5",2,0,5,0],["I4",0,0,0,5],["L4",1,1,1,5],["T4",0,0,6,5]]},{"n":"","r":"..#####/#######/#######/.######/######./#######/#######/#####../...##..","p":[["F5",1,1,3,2],["N5",1,1,3,0],["Y5",1,0,1,1],["W5",2,0,1,4],["T5",2,0,3,4],["Z5",1,0,0,0],["L5",3,1,0,3],["U5",2,0,5,0],["I4",0,0,6,3],["T4",2,0,6,0],["O4",0,0,7,3]]},{"n":"","r":".##.#.../########/########/########/.#######/########/.#.#####/...##.../...##...","p":[["T5",2,0,3,3],["W5",0,0,3,5],["I5",0,0,6,3],["V5",1,0,2,3],["Y5",2,1,1,6],["X5",0,0,4,0],["N5",2,1,1,1],["Z5",1,1,0,4],["L4",0,0,1,0],["S4",0,1,0,1],["O4",0,0,7,3]]},{"n":"","r":".####.##./.######../#########/#########/#########/.###.####/..##.##../.....##..","p":[["Z5",0,0,2,3],["X5",0,0,2,1],["N5",1,1,1,0],["V5",0,0,1,5],["L5",3,1,0,1],["W5",0,0,3,0],["U5",1,0,0,6],["P5",1,1,4,5],["I4",1,0,2,8],["L4",0,1,4,2],["O4",0,0,6,5]]},{"n":"","r":"..##..../..##..../.######./########/.#######/.#######/.######./########/#######./##..##..","p":[["W5",2,0,4,3],["N5",3,0,3,3],["U5",3,0,3,6],["Y5",2,0,3,2],["I5",0,0,2,2],["X5",0,0,6,5],["F5",0,0,6,2],["L5",0,0,5,1],["P5",2,1,7,4],["T4",1,0,2,0],["L4",0,0,7,0],["O4",0,0,0,2]]},{"n":"","r":"####..##/.###.###/#######./######../########/########/.#######/.######./..##.#..","p":[["I5",0,0,4,2],["N5",1,1,5,3],["P5",3,1,5,1],["W5",1,0,3,0],["V5",3,0,4,5],["Z5",1,0,1,0],["X5",0,0,1,4],["L5",0,0,0,3],["Y5",1,1,7,3],["T4",0,0,0,0],["S4",0,1,7,1],["O4",0,0,0,6]]},{"n":"","r":".#######./#########/#########/..######./.########/#########/.##....##","p":[["L5",1,1,3,3],["N5",1,0,2,3],["I5",0,0,5,2],["Y5",1,1,1,3],["Z5",0,0,2,6],["U5",3,0,2,1],["W5",2,0,0,6],["F5",3,1,0,0],["O4",0,0,5,7],["S4",0,1,5,0],["I4",0,0,0,2]]},{"n":"","r":"##.##.##./#####.###/.########/#########/.########/#########/#########","p":[["I5",0,0,3,2],["Y5",3,0,4,3],["F5",0,1,3,0],["V5",3,0,3,5],["U5",0,0,5,0],["Z5",1,1,1,6],["T5",2,0,0,3],["W5",3,0,0,1],["L5",1,1,5,3],["S4",0,1,0,6],["L4",0,1,4,7],["O4",0,0,0,0]]},{"n":"","r":".##.#.../.######./########/########/########/########/########/#....#.#","p":[["X5",0,0,2,2],["F5",0,1,2,4],["P5",3,0,3,0],["L5",3,0,4,1],["U5",3,0,2,6],["V5",2,0,5,5],["Y5",1,1,6,3],["T5",3,0,5,0],["T4",2,0,1,0],["S4",0,1,0,1],["L4",1,1,0,4]]},{"n":"","r":".#..###./###..##./.#..###./.#..####/.#######/#######./########/#..#####/..######","p":[["I5",0,0,4,2],["V5",0,0,3,1],["W5",1,0,5,3],["F5",1,0,5,5],["L5",3,1,3,4],["T5",3,0,5,0],["N5",3,0,7,4],["X5",0,0,0,0],["I4",0,0,8,2],["T4",2,0,1,4],["L4",3,1,0,4]]},{"n":"","r":"#.######../#.######../#.######../#######.../..########/.#########/.######.../.###.###..","p":[["Z5",0,0,2,3],["F5",1,0,2,1],["Y5",3,1,4,1],["T5",1,0,5,3],["W5",0,0,2,5],["L5",3,1,1,3],["U5",1,0,5,6],["P5",3,0,6,1],["V5",2,0,0,5],["L4",1,0,0,2],["I4",1,0,0,0],["O4",0,0,4,8]]},{"n":"","r":".#.##...../########../.#######../.#########/#########./########../########../...#####..","p":[["U5",3,0,2,4],["F5",0,1,2,2],["Z5",1,1,4,2],["L5",0,1,2,5],["W5",1,0,3,0],["Y5",3,1,5,0],["N5",3,1,6,3],["V5",2,0,1,5],["X5",0,0,0,0],["O4",0,0,0,3],["L4",0,1,5,6],["S4",0,0,3,7]]},{"n":"","r":"..######/.#######/.######./.######./.######./#######./#######./.###..#./.####.#./.###....","p":[["N5",1,0,4,2],["P5",1,0,3,3],["Y5",3,0,2,1],["I5",0,0,1,1],["L5",2,0,2,5],["T5",2,0,3,0],["F5",0,1,6,0],["Z5",0,0,6,2],["V5",2,0,6,4],["O4",0,0,0,6],["T4",2,0,8,1],["I4",0,0,0,2]]},{"n":"","r":"...#.##./.#######/.######./#######./#######./#######./#######./#######./.....#..","p":[["W5",0,0,3,3],["V5",1,0,2,2],["T5",3,0,5,3],["P5",2,0,5,1],["U5",3,0,1,4],["Y5",0,0,3,5],["Z5",1,0,0,1],["F5",0,1,0,5],["O4",0,0,3,0],["L4",2,1,5,0],["T4",0,0,7,4]]},{"n":"","r":".....####/.########/.#######./.########/.########/.########/########./######...","p":[["P5",3,1,3,3],["X5",0,0,3,5],["Y5",1,0,1,3],["Z5",0,0,1,6],["V5",1,0,1,2],["T5",3,0,4,2],["W5",3,0,4,6],["L5",3,1,0,5],["N5",3,1,6,1],["S4",1,1,5,0],["I4",1,0,1,1],["L4",0,1,5,4]]},{"n":"","r":"######../########/.######./.#######/.#######/########/.#####.#/.####...","p":[["L5",0,0,2,3],["I5",1,0,0,4],["V5",3,0,4,3],["P5",0,0,0,2],["N5",2,1,2,1],["F5",2,1,4,0],["X5",0,0,2,5],["T5",3,0,0,5],["T4",1,0,4,6],["O4",0,0,0,0],["I4",0,0,7,1]]},{"n":"","r":"...#..#./..#####./#######./########/.#######/.#######/.######./.######./..####..","p":[["T5",0,0,3,3],["N5",0,1,2,2],["F5",3,0,5,2],["U5",0,0,7,2],["X5",0,0,0,2],["I5",1,0,4,5],["W5",3,0,0,4],["P5",2,1,2,6],["L4",2,1,5,6],["I4",1,0,4,1],["O4",0,0,2,0]]},{"n":"","r":"...##..#/.#######/########/########/.#######/.#######/#######./.######./..####..","p":[["P5",2,0,3,3],["Y5",0,1,2,2],["U5",2,0,1,1],["Z5",0,0,0,3],["N5",2,0,2,5],["X5",0,0,5,0],["L5",3,0,5,3],["T5",1,0,0,5],["I5",0,0,7,2],["S4",1,0,2,0],["I4",0,0,8,2],["T4",1,0,3,6]]},{"n":"","r":".#######/########/########/.#######/.#######/########/########/..##.#.#","p":[["L5",3,1,3,2],["U5",2,0,4,2],["P5",2,0,5,2],["X5",0,0,5,4],["N5",2,1,4,6],["V5",1,0,2,1],["W5",2,0,2,5],["Z5",1,1,0,2],["I5",0,0,0,3],["L4",3,1,1,5],["O4",0,0,5,0],["S4",1,1,0,0]]},{"n":"","r":"...#####/#.######/########/########/########/########/.###.###/......##","p":[["I5",0,0,3,1],["L5",1,1,3,0],["T5",1,0,3,4],["U5",2,0,5,3],["P5",1,0,5,0],["X5",0,0,0,2],["N5",3,1,1,4],["Y5",3,0,0,4],["L4",1,1,1,0],["I4",1,0,2,7],["O4",0,0,6,6]]},{"n":"","r":"....###../########./.#####.../.#######./..######./.#######./#########/.#####.##","p":[["Y5",2,1,2,3],["U5",1,0,3,2],["W5",3,0,0,2],["T5",0,0,1,0],["X5",0,0,5,0],["I5",1,0,1,5],["F5",1,1,5,4],["P5",0,1,3,6],["S4",0,1,0,5],["T4",2,0,6,2],["O4",0,0,6,7]]},{"n":"","r":"..#...../.###..../########/########/########/.#######/.#######/########/.#######","p":[["N5",3,0,3,2],["U5",3,0,3,5],["X5",0,0,4,2],["L5",3,0,5,4],["P5",3,0,3,0],["T5",3,0,6,2],["V5",2,0,2,5],["I5",0,0,2,0],["Y5",2,1,5,0],["L4",3,0,7,3],["O4",0,0,7,6],["T4",2,0,0,1]]}];
+const LABEL_H = 24, PAD = 10, GAP = 16;
+const byId = (id) => document.getElementById(id);
+const stage = byId('stage'), table = byId('table'), boardSvg = byId('board');
+const trayBox = byId('tray'), piecesEl = byId('pieces');
+const boardLabel = byId('boardLabel'), trayLabel = byId('trayLabel');
+const overlay = byId('overlay'), card = byId('card'), toastEl = byId('toast');
+const timeEl = byId('time'), sandEl = byId('sand'), sandFill = byId('sandFill'), clockMeta = byId('clockMeta');
+const btnHint = byId('btnHint'), btnClear = byId('btnClear');
+const btnGiveUp = byId('btnGiveUp'), btnNew = byId('btnNew');
+const giveUpLbl = byId('giveUpLbl'), giveUpIcon = byId('giveUpIcon'), newLbl = byId('newLbl'), newIcon = byId('newIcon');
+const recordsEl = byId('records'), keysEl = byId('keys');
+const hudEl = byId('hud'), levelSeg = byId('levelSeg');
+const menuEl = byId('menu'), chaptersEl = byId('chapters'), menuRule = byId('menuRule');
+const menuDone = byId('menuDone'), menuStars = byId('menuStars'), menuBar = byId('menuBar'), menuSync = byId('menuSync');
+const dailyArt = byId('dailyArt'), dailyTitle = byId('dailyTitle'), dailyText = byId('dailyText'), btnDaily = byId('btnDaily');
+const btnProgress = byId('btnProgress'), progressEl = byId('progress'), noHintEl = byId('noHint');
+const canVibrate = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
+function buzz(ms) { if (canVibrate && coarse.matches) { try { navigator.vibrate(ms); } catch (e) { /* refusé */ } } }
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const coarse = window.matchMedia('(pointer: coarse)');
+
+const ICONS = {
+  eye: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>',
+  skip: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6l7 6-7 6z"/><path d="M13 6l7 6-7 6z"/></svg>',
+  again: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.4 3.8v4.7h4.7"/></svg>',
+  grid: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/></svg>',
+};
+const LOCK_SVG = '<svg class="tile-lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>';
+const STAR_D = 'M12 2.5L14.59 8.94L21.51 9.41L16.18 13.86L17.88 20.59L12 16.9L6.12 20.59L7.82 13.86L2.49 9.41L9.41 8.94Z';
+function starsSvg(k, size) {
+  let out = '';
+  for (let j = 0; j < 3; j++) out += `<svg class="star ${j < k ? 'on' : 'off'}" viewBox="0 0 24 24" aria-hidden="true"><path d="${STAR_D}"/></svg>`;
+  return `<span class="stars${size ? ` ${size}` : ''}" role="img" aria-label="${k} ${k > 1 ? 'étoiles' : 'étoile'} sur 3">${out}</span>`;
+}
+
+/* ---------- Statistiques (gardées dans ce navigateur) ---------- */
+const STORE = 'casse-tete-xl:v1';
+function blankLevel() { return { solved: 0, best: null, recent: [], sprintBest: 0 }; }
+function loadStats() {
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) { s = null; }
+  if (!s || typeof s !== 'object') s = {};
+  for (const k of Object.keys(LEVELS)) {
+    const v = s[k];
+    if (!v || typeof v !== 'object' || !Array.isArray(v.recent)) s[k] = blankLevel();
+  }
+  if (!s.prefs || typeof s.prefs !== 'object') s.prefs = {};
+  if (!s.camp2 || typeof s.camp2 !== 'object') s.camp2 = {};
+  if (!Array.isArray(s.done2)) s.done2 = [];
+  if (!s.sprint || typeof s.sprint !== 'object') s.sprint = {};
+  if (!Array.isArray(s.log)) s.log = [];
+  if (!s.daily || typeof s.daily !== 'object') s.daily = {};
+  if (!Array.isArray(s.clean2)) s.clean2 = [];
+  // les anciens records de sprint étaient sur 5 minutes
+  for (const k of Object.keys(LEVELS)) {
+    const old = s[k].sprintBest || 0;
+    if (old > (s.sprint[`${k}-5`] || 0)) s.sprint[`${k}-5`] = old;
+  }
+  return s;
+}
+function saveLocal() { try { localStorage.setItem(STORE, JSON.stringify(stats)); } catch (e) { /* stockage indisponible */ } }
+function saveStats() { saveLocal(); pushRemote(); }
+let stats = loadStats();
+
+/* ---------- Formats ---------- */
+const plural = (n, one, many) => `${n} ${n > 1 ? many : one}`;
+function fmt(ms) {
+  const t = Math.max(0, Math.round(ms / 1000));
+  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
+}
+function fmtPrecise(ms) {
+  const d = Math.max(0, Math.round(ms / 100));
+  const s = Math.floor(d / 10);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')},${d % 10}`;
+}
+const now = () => performance.now();
+const newSeed = () => 100000 + Math.floor(Math.random() * 900000);
+
+/* ---------- Campagne : les 50 formes ---------- */
+const campCache = [];
+function colorize(P, rnd) {
+  const { W, H } = P;
+  const owner = new Int16Array(W * H).fill(-1);
+  for (const s of P.solution) {
+    for (const [r, c] of transform(LIB_BY_KEY[P.pieces[s.piece]].cells, s.rot, s.flip)) owner[(s.ar + r) * W + s.ac + c] = s.piece;
+  }
+  const near = P.pieces.map(() => new Set());
+  const link = (a, b) => { if (a >= 0 && b >= 0 && a !== b) { near[a].add(b); near[b].add(a); } };
+  for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) {
+    if (c + 1 < W) link(owner[r * W + c], owner[r * W + c + 1]);
+    if (r + 1 < H) link(owner[r * W + c], owner[(r + 1) * W + c]);
+  }
+  const pal = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], rnd);
+  const used = new Map(), colors = [];
+  const order = P.pieces.map((_, k) => k).sort((a, b) => near[b].size - near[a].size);
+  for (const k of order) {
+    const banned = new Set([...near[k]].map((j) => colors[j]).filter((x) => x !== undefined));
+    const cand = pal.filter((x) => !banned.has(x)).sort((a, b) => (used.get(a) || 0) - (used.get(b) || 0));
+    const pick = cand.length ? cand[0] : pal[0];
+    colors[k] = pick;
+    used.set(pick, (used.get(pick) || 0) + 1);
+  }
+  return colors;
+}
+function campaignPuzzle(i) {
+  if (campCache[i]) return campCache[i];
+  const def = CAMPAIGN[i];
+  const rows = def.r.split('/');
+  const H = rows.length, W = Math.max(...rows.map((row) => row.length));
+  const region = new Uint8Array(W * H);
+  rows.forEach((row, r) => { for (let c = 0; c < row.length; c++) if (row[c] === '#') region[r * W + c] = 1; });
+  const pieces = def.p.map((x) => x[0]);
+  const solution = def.p.map((x, k) => ({ piece: k, rot: x[1], flip: x[2], ar: x[3], ac: x[4] }));
+  const rnd = mulberry32(7919 * (i + 1));
+  const P = {
+    W, H, region, pieces, solution, locked: true,
+    lockedKeys: solution.map((s) => transformKey(pieces[s.piece], s.rot, s.flip)),
+    start: solution.map((s) => ({ rot: s.rot, flip: s.flip })),
+    trayOrder: shuffle(pieces.map((_, k) => k), rnd),
+    idx: i, name: `Niveau ${i + 1}`, seed: i + 1,
+  };
+  P.colors = colorize(P, rnd);
+  return (campCache[i] = P);
+}
+const campBest = (i) => (typeof stats.camp2[i] === 'number' ? stats.camp2[i] : null);
+function starsFor(t, n) {
+  if (t == null) return 0;
+  if (t <= n * PAR3) return 3;
+  if (t <= n * PAR2) return 2;
+  return t <= LIMIT_NIV ? 1 : 0;
+}
+const campDone = (i) => campBest(i) != null || stats.done2.includes(i);
+const campStars = (i) => (campBest(i) != null ? starsFor(campBest(i), CAMPAIGN[i].p.length) : campDone(i) ? 1 : 0);
+const isOpen = (i) => i === 0 || campDone(i - 1);
+const doneCount = () => CAMPAIGN.reduce((a, _, i) => a + (campDone(i) ? 1 : 0), 0);
+const starTotal = () => CAMPAIGN.reduce((a, _, i) => a + campStars(i), 0);
+function nextLevel() {
+  for (let i = 0; i < CAMPAIGN.length; i++) if (!campDone(i)) return isOpen(i) ? i : -1;
+  return -1;
+}
+function freshPuzzle(level, seed) {
+  const P = generatePuzzle(level, seed);
+  P.colors = colorize(P, mulberry32(seed ^ 0x9e37));
+  return P;
+}
+function dayKey(d) {
+  d = d || new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function daySeed(key) { let h = 2166136261; for (const ch of key) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) % 900000 + 100000; }
+function dailyPuzzle(key) {
+  const P = freshPuzzle('xl', daySeed(key));
+  P.name = 'Défi du jour'; P.dayKey = key;
+  return P;
+}
+const dailyBest = (key) => (typeof stats.daily[key] === 'number' ? stats.daily[key] : null);
+function logRun(entry) {
+  stats.log.push(entry);
+  stats.log.sort((a, b) => a.d - b.d);
+  while (stats.log.length > 40) stats.log.shift();
+}
+const sprintKey = () => `${S.level}-${S.dur / 60000}`;
+const sprintBest = () => stats.sprint[sprintKey()] || 0;
+
+/* ---------- Sauvegarde en ligne : suit le compte, survit aux reconnexions ---------- */
+const SYNC_DOC = 'progress/main';
+let dbRef = null, syncBusy = false, syncAgain = false, syncState = 'wait';
+function mergeRemote(r) {
+  if (!r || typeof r !== 'object') return false;
+  let changed = false;
+  const rc = r.camp2 && typeof r.camp2 === 'object' ? r.camp2 : {};
+  for (const k of Object.keys(rc)) {
+    const v = rc[k];
+    if (typeof v === 'number' && (typeof stats.camp2[k] !== 'number' || v < stats.camp2[k])) { stats.camp2[k] = v; changed = true; }
+  }
+  for (const i of Array.isArray(r.done2) ? r.done2 : []) {
+    if (Number.isInteger(i) && i >= 0 && i < CAMPAIGN.length && !stats.done2.includes(i)) { stats.done2.push(i); changed = true; }
+  }
+  const rs = r.sprint && typeof r.sprint === 'object' ? r.sprint : {};
+  for (const k of Object.keys(rs)) if (typeof rs[k] === 'number' && rs[k] > (stats.sprint[k] || 0)) { stats.sprint[k] = rs[k]; changed = true; }
+  const rv = r.solved && typeof r.solved === 'object' ? r.solved : {};
+  for (const k of Object.keys(LEVELS)) if (typeof rv[k] === 'number' && rv[k] > stats[k].solved) { stats[k].solved = rv[k]; changed = true; }
+  const rd2 = r.daily && typeof r.daily === 'object' ? r.daily : {};
+  for (const k of Object.keys(rd2)) if (typeof rd2[k] === 'number' && (typeof stats.daily[k] !== 'number' || rd2[k] < stats.daily[k])) { stats.daily[k] = rd2[k]; changed = true; }
+  for (const i of Array.isArray(r.clean2) ? r.clean2 : []) if (Number.isInteger(i) && !stats.clean2.includes(i)) { stats.clean2.push(i); changed = true; }
+  const have = new Set(stats.log.map((e) => e.d));
+  for (const e of Array.isArray(r.log) ? r.log : []) {
+    if (e && typeof e.d === 'number' && typeof e.t === 'number' && !have.has(e.d)) { stats.log.push(e); have.add(e.d); changed = true; }
+  }
+  if (changed) { stats.log.sort((a, b) => a.d - b.d); while (stats.log.length > 40) stats.log.shift(); }
+  return changed;
+}
+function aheadOf(r) {
+  r = r && typeof r === 'object' ? r : {};
+  const rc = r.camp2 || {}, rs = r.sprint || {}, rv = r.solved || {}, rd = Array.isArray(r.done2) ? r.done2 : [];
+  for (const k of Object.keys(stats.camp2)) if (typeof rc[k] !== 'number' || stats.camp2[k] < rc[k]) return true;
+  for (const i of stats.done2) if (!rd.includes(i)) return true;
+  for (const k of Object.keys(stats.sprint)) if ((stats.sprint[k] || 0) > (rs[k] || 0)) return true;
+  for (const k of Object.keys(LEVELS)) if (stats[k].solved > (rv[k] || 0)) return true;
+  const rd2 = r.daily || {}, rcl = Array.isArray(r.clean2) ? r.clean2 : [], rl = new Set((Array.isArray(r.log) ? r.log : []).map((e) => e && e.d));
+  for (const k of Object.keys(stats.daily)) if (typeof rd2[k] !== 'number' || stats.daily[k] < rd2[k]) return true;
+  for (const i of stats.clean2) if (!rcl.includes(i)) return true;
+  for (const e of stats.log) if (!rl.has(e.d)) return true;
+  return false;
+}
+function remoteBody() {
+  const solved = {};
+  for (const k of Object.keys(LEVELS)) solved[k] = stats[k].solved;
+  return { v: 1, camp2: stats.camp2, done2: stats.done2, sprint: stats.sprint, solved, daily: stats.daily, clean2: stats.clean2, log: stats.log };
+}
+async function pushRemote() {
+  if (!dbRef) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  try { await dbRef.set(remoteBody()); setSync('ok'); } catch (e) { setSync('warn'); }
+  syncBusy = false;
+  if (syncAgain) { syncAgain = false; pushRemote(); }
+}
+function setSync(state) {
+  syncState = state;
+  if (!menuSync) return;
+  menuSync.classList.toggle('is-ok', state === 'ok');
+  menuSync.classList.toggle('is-warn', state === 'warn' || state === 'local');
+  menuSync.textContent = state === 'ok' ? 'Progression sauvegardée sur ton compte'
+    : state === 'warn' ? 'Sauvegarde en ligne injoignable pour l’instant : progression gardée sur cet appareil'
+    : state === 'local' ? 'Progression gardée sur cet appareil. Copie ton code de sauvegarde pour la garder ailleurs.'
+    : 'Connexion à ta sauvegarde…';
+}
+function exportCode() {
+  const b = remoteBody();
+  const o = {
+    v: 1, c: b.camp2, d: b.done2, s: b.sprint, o: b.solved, y: b.daily, k: b.clean2,
+    l: b.log.map((e) => [e.t, e.n, e.d, e.k === 'defi' ? -1 : (e.i | 0), e.h || 0]),
+  };
+  return 'CTXL1-' + btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodeCode(str) {
+  const m = String(str || '').replace(/\s+/g, '').match(/CTXL1-([A-Za-z0-9_-]+)/);
+  if (!m) return null;
+  try {
+    let b64 = m[1].replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const o = JSON.parse(atob(b64));
+    if (!o || typeof o !== 'object') return null;
+    return {
+      camp2: o.c || {}, done2: o.d || [], sprint: o.s || {}, solved: o.o || {}, daily: o.y || {}, clean2: o.k || [],
+      log: (Array.isArray(o.l) ? o.l : []).filter(Array.isArray).map((a) => (a[3] === -1
+        ? { t: a[0], n: a[1], d: a[2], k: 'defi', h: a[4] || 0 }
+        : { t: a[0], n: a[1], d: a[2], k: 'niv', i: a[3], h: a[4] || 0 })),
+    };
+  } catch (e) { return null; }
+}
+function importCode(str) {
+  const r = decodeCode(str);
+  if (!r) { toast('Code non reconnu : il doit commencer par CTXL1- et être copié en entier.', 3400); return false; }
+  const before = doneCount();
+  const changed = mergeRemote(r);
+  if (changed) { saveStats(); refreshProgress(); }
+  const gained = doneCount() - before;
+  toast(changed
+    ? `Progression restaurée : ${doneCount()} formes réussies${gained > 0 ? ` (${gained} de plus)` : ''}.`
+    : 'Rien de nouveau dans ce code : ta progression est déjà à jour.', 3400);
+  return true;
+}
+function showCodeCard(code) {
+  const html = cardHead('Code de sauvegarde')
+    + '<div class="card-body"><h2 id="cardTitle">Ton code de sauvegarde</h2>'
+    + '<p>Sélectionne-le et copie-le, puis colle-le avec « Restaurer » dans l’autre version du jeu.</p></div>'
+    + `<div class="card-foot"><textarea id="codeOut" class="code-input" rows="4" readonly spellcheck="false" aria-label="Code de sauvegarde">${code}</textarea>`
+    + '<button type="button" class="btn primary" data-act="closecard" data-primary>Fermer</button></div>';
+  showCard(html, 'full');
+  const ta = byId('codeOut');
+  if (ta) { ta.focus({ preventScroll: true }); ta.select(); }
+}
+function showRestoreCard() {
+  const html = cardHead('Code de sauvegarde')
+    + '<div class="card-body"><h2 id="cardTitle">Restaurer une progression</h2>'
+    + '<p>Colle le code copié depuis l’autre version du jeu. Les deux progressions sont fusionnées : tu gardes le meilleur des deux.</p></div>'
+    + '<div class="card-foot"><textarea id="codeIn" class="code-input" rows="4" spellcheck="false" autocomplete="off" placeholder="CTXL1-…" aria-label="Code à restaurer"></textarea>'
+    + '<button type="button" class="btn primary" data-act="restore" data-primary>Restaurer</button>'
+    + '<button type="button" class="btn" data-act="closecard">Annuler</button></div>';
+  showCard(html, 'full');
+  const ta = byId('codeIn');
+  if (ta) ta.focus({ preventScroll: true });
+}
+async function copyCode() {
+  const code = exportCode();
+  try {
+    await navigator.clipboard.writeText(code);
+    toast('Code copié. Colle-le avec « Restaurer » dans l’autre version du jeu.', 3200);
+  } catch (e) {
+    showCodeCard(code);
+  }
+}
+function checkHashCode(delay) {
+  const hm = (location.hash || '').match(/^#code=(.+)$/);
+  if (!hm) return;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* lien conservé */ }
+  setTimeout(() => importCode(decodeURIComponent(hm[1])), delay);
+}
+function refreshProgress() {
+  if (S.view === 'menu') { renderMenu(); renderDaily(); if (!progressEl.hidden) renderProgress(); }
+  updateRecords();
+}
+async function startSync() {
+  let db = null;
+  try { db = window.claude && typeof window.claude.use === 'function' ? await window.claude.use('db') : null; } catch (e) { db = null; }
+  if (!db) { setSync('local'); return; }
+  try { dbRef = db.doc(SYNC_DOC); } catch (e) { dbRef = null; setSync('local'); return; }
+  const timer = setTimeout(() => { if (syncState === 'wait') setSync('warn'); }, 10000);
+  dbRef.onSnapshot((snap) => {
+    if (snap.metadata.hasPendingWrites) return;
+    const remote = snap.exists ? snap.data() : null;
+    if (mergeRemote(remote)) { saveLocal(); refreshProgress(); }
+    if (snap.metadata.fromCache) return;
+    clearTimeout(timer);
+    if (aheadOf(remote)) pushRemote(); else setSync('ok');
+  }, () => { clearTimeout(timer); dbRef = null; setSync('warn'); });
+}
+
+/* ---------- État ---------- */
+const S = {
+  mode: 'niveaux', view: 'menu', level: 'moyen', lvl: 0, kind: 'level', dayKey: '', dur: 300000, limit: LIMIT_NIV, phase: 'menu',
+  puzzle: null, pieces: [], occ: null, area: 0, covered: 0, trayOrder: [],
+  startedAt: 0, penalty: 0, frozenElapsed: 0,
+  hints: 0, skips: 0, sprintSolved: 0, busy: false,
+  counters: { drops: 0, lifts: 0 },
+  placeOrder: [],
+};
+let L = null, drag = null, ghostEl = null, ghostEdgeEl = null, rafId = 0, overlayAnchor = 'full';
+
+/* ---------- Pièces ---------- */
+function refreshShape(p) {
+  const cells = transform(LIB_BY_KEY[p.key].cells, p.rot, p.flip);
+  let h = 0, w = 0;
+  for (const [r, c] of cells) { if (r + 1 > h) h = r + 1; if (c + 1 > w) w = c + 1; }
+  p.cells = cells; p.h = h; p.w = w;
+  const set = new Set(cells.map(([r, c]) => r * 8 + c));
+  const has = (r, c) => r >= 0 && c >= 0 && set.has(r * 8 + c);
+  let fill = '', seams = '', edge = '';
+  for (const [r, c] of cells) {
+    fill += `M${c} ${r}h1v1h-1z`;
+    if (has(r, c + 1)) seams += `M${c + 1} ${r + 0.14}V${r + 0.86}`;
+    if (has(r + 1, c)) seams += `M${c + 0.14} ${r + 1}H${c + 0.86}`;
+    if (!has(r - 1, c)) edge += `M${c} ${r}H${c + 1}`;
+    if (!has(r + 1, c)) edge += `M${c} ${r + 1}H${c + 1}`;
+    if (!has(r, c - 1)) edge += `M${c} ${r}V${r + 1}`;
+    if (!has(r, c + 1)) edge += `M${c + 1} ${r}V${r + 1}`;
+  }
+  const svg = p.el.firstChild;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  const [pf, pg, ps, po] = svg.children;
+  pf.setAttribute('d', fill); pg.setAttribute('d', fill); ps.setAttribute('d', seams); po.setAttribute('d', edge);
+}
+function sizeEl(p) {
+  if (!L) return;
+  p.el.style.width = `${p.w * L.cell}px`;
+  p.el.style.height = `${p.h * L.cell}px`;
+}
+function setPos(p, x, y, s) {
+  p.x = x; p.y = y; p.s = s;
+  p.el.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+}
+function positionPiece(p) {
+  if (!L) return;
+  if (p.placed) { setPos(p, L.bx + p.ac * L.cell, L.by + p.ar * L.cell, 1); return; }
+  const slot = L.slots[L.slotOf[p.i]];
+  if (!slot) return;
+  setPos(p, slot.cx - (p.w * L.tc) / 2, slot.cy - (p.h * L.tc) / 2, L.tc / L.cell);
+}
+const ANIMS = ['bump', 'pop', 'enter', 'hinted', 'bad'];
+function replay(el, cls, delay) {
+  if (reduceMotion.matches) return;
+  const svg = el.firstChild;
+  clearTimeout(el._animT);
+  el.classList.remove(...ANIMS);
+  svg.style.animationDelay = delay ? `${delay}ms` : '';
+  void el.offsetWidth;
+  el.classList.add(cls);
+  el._animT = setTimeout(() => el.classList.remove(cls), 1300 + (delay || 0));
+}
+
+function loadPuzzle(P) {
+  S.puzzle = P;
+  S.occ = new Int16Array(P.W * P.H);
+  S.area = 0;
+  for (let i = 0; i < S.occ.length; i++) { S.occ[i] = P.region[i] ? -1 : -2; S.area += P.region[i]; }
+  S.covered = 0;
+  S.trayOrder = P.trayOrder.slice();
+  S.placeOrder = [];
+  S.counters = { drops: 0, lifts: 0 };
+  drag = null;
+  piecesEl.textContent = '';
+  S.pieces = P.pieces.map((key, i) => {
+    const el = document.createElement('div');
+    el.className = 'piece';
+    el.style.setProperty('--pc', `var(--p${P.colors[i]})`);
+    el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path class="pf"/><path class="pg"/><path class="ps"/><path class="po"/></svg>';
+    piecesEl.appendChild(el);
+    const lib = LIB_BY_KEY[key];
+    const p = { i, key, name: lib.name, size: lib.size, color: P.colors[i], rot: P.start[i].rot, flip: P.start[i].flip,
+      placed: false, ar: 0, ac: 0, el, x: 0, y: 0, s: 1, cells: null, w: 0, h: 0 };
+    refreshShape(p);
+    return p;
+  });
+  boardSvg.classList.remove('is-solved');
+  updateBoardLabel();
+  trayLabel.textContent = `Réserve · ${plural(P.pieces.length, 'pièce', 'pièces')}`;
+  layout(true);
+  S.trayOrder.forEach((i, n) => replay(S.pieces[i].el, 'enter', n * 35));
+  updateButtons();
+  updateMeta();
+}
+
+/* ---------- Mise en page ---------- */
+function packSlots(dims, cell, availW) {
+  const g = Math.max(8, cell * 0.6);
+  const rows = [];
+  let row = null;
+  dims.forEach((d, j) => {
+    const sw = d.w * cell, sh = d.h * cell;
+    if (!row || (row.items.length && row.w + g + sw > availW)) { row = { items: [], w: 0, h: 0 }; rows.push(row); }
+    const x = row.items.length ? row.w + g : 0;
+    row.items.push({ j, sw, sh, x });
+    row.w = x + sw;
+    row.h = Math.max(row.h, sh);
+  });
+  const totalH = rows.reduce((a, r) => a + r.h, 0) + g * Math.max(0, rows.length - 1);
+  const maxW = rows.reduce((a, r) => Math.max(a, r.w), 0);
+  return { rows, totalH, maxW, g };
+}
+function fitTray(dims, availW, availH, maxCell) {
+  const top = Math.max(4, maxCell);
+  const full = packSlots(dims, top, availW);
+  if (full.totalH <= availH && full.maxW <= availW) return { cell: top, pack: full };
+  let lo = 4, hi = top, best = null;
+  for (let it = 0; it < 20; it++) {
+    const mid = (lo + hi) / 2, pk = packSlots(dims, mid, availW);
+    if (pk.totalH <= availH && pk.maxW <= availW) { best = { cell: mid, pack: pk }; lo = mid; } else hi = mid;
+  }
+  return best || { cell: 4, pack: packSlots(dims, 4, availW) };
+}
+function layout(instant) {
+  const P = S.puzzle;
+  if (!P) return;
+  const W = stage.clientWidth, H = stage.clientHeight;
+  if (W < 60 || H < 60) return;
+  const dims = S.trayOrder.map((i) => ({ w: S.pieces[i].w, h: S.pieces[i].h }));
+  const wide = W >= 700 && W / H >= 1.1;
+  let cell, bx, by, tray;
+  if (wide) {
+    const boardW = Math.max(W * 0.5, Math.min(W * 0.58, W - 280));
+    cell = Math.floor(Math.min((boardW - 2 * PAD) / P.W, (H - LABEL_H - 2 * PAD) / P.H, 72));
+    bx = Math.round((boardW - P.W * cell) / 2);
+    by = Math.round(LABEL_H + PAD + (H - LABEL_H - 2 * PAD - P.H * cell) / 2);
+    tray = { x: Math.round(boardW + GAP), y: 0 };
+    tray.w = W - tray.x; tray.h = H;
+  } else {
+    const maxCell = Math.floor(Math.min((W - 2 * PAD) / P.W, 60));
+    let pick = null;
+    for (let c = maxCell; c >= 12; c--) {
+      const boardH = LABEL_H + P.H * c;
+      const th = H - boardH - GAP;
+      if (th < 80) continue;
+      const fit = fitTray(dims, W - 2 * PAD, th - LABEL_H - 2 * PAD, c);
+      const score = Math.min(c, fit.cell / 0.6);
+      if (!pick || score > pick.score) pick = { c, boardH, score };
+      if (fit.cell >= c * 0.6) break;
+    }
+    if (!pick) pick = { c: 12, boardH: LABEL_H + P.H * 12 };
+    cell = pick.c;
+    bx = Math.round((W - P.W * cell) / 2);
+    by = LABEL_H;
+    tray = { x: 0, y: Math.round(pick.boardH + GAP), w: W };
+    tray.h = Math.max(80, H - tray.y);
+  }
+  const availW = tray.w - 2 * PAD, availH = tray.h - LABEL_H - 2 * PAD;
+  const fit = fitTray(dims, availW, availH, cell);
+  const pk = fit.pack, slots = [], slotOf = {};
+  let y = tray.y + LABEL_H + PAD + Math.max(0, (availH - pk.totalH) / 2);
+  for (const row of pk.rows) {
+    const x0 = tray.x + PAD + (availW - row.w) / 2;
+    for (const it of row.items) {
+      slots[it.j] = { cx: x0 + it.x + it.sw / 2, cy: y + row.h / 2, sw: it.sw, sh: it.sh };
+      slotOf[S.trayOrder[it.j]] = it.j;
+    }
+    y += row.h + pk.g;
+  }
+  L = { W, H, wide, cell, bx, by, tray, tc: Math.min(fit.cell, cell), slots, slotOf, gap: pk.g };
+  drawBoard();
+  boardLabel.style.transform = `translate(${bx}px, ${by - LABEL_H + 3}px)`;
+  trayBox.style.transform = `translate(${tray.x}px, ${tray.y}px)`;
+  trayBox.style.width = `${tray.w}px`;
+  trayBox.style.height = `${tray.h}px`;
+  if (instant) stage.classList.add('no-anim');
+  for (const p of S.pieces) {
+    sizeEl(p);
+    if (drag && drag.p === p && drag.moved) continue;
+    positionPiece(p);
+  }
+  if (instant) requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-anim')));
+  if (!overlay.hidden) placeOverlay();
+}
+function drawBoard() {
+  const P = S.puzzle, c = L.cell;
+  const w = P.W * c, h = P.H * c;
+  const inR = (r, cc) => r >= 0 && cc >= 0 && r < P.H && cc < P.W && P.region[r * P.W + cc] === 1;
+  let fill = '', seams = '', edge = '';
+  for (let r = 0; r < P.H; r++) for (let cc = 0; cc < P.W; cc++) {
+    if (!inR(r, cc)) continue;
+    const x = cc * c, y = r * c;
+    fill += `M${x} ${y}h${c}v${c}h${-c}z`;
+    if (inR(r, cc + 1)) seams += `M${x + c} ${y}v${c}`;
+    if (inR(r + 1, cc)) seams += `M${x} ${y + c}h${c}`;
+    if (!inR(r - 1, cc)) edge += `M${x} ${y}h${c}`;
+    if (!inR(r + 1, cc)) edge += `M${x} ${y + c}h${c}`;
+    if (!inR(r, cc - 1)) edge += `M${x} ${y}v${c}`;
+    if (!inR(r, cc + 1)) edge += `M${x + c} ${y}v${c}`;
+  }
+  boardSvg.setAttribute('width', w);
+  boardSvg.setAttribute('height', h);
+  boardSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  boardSvg.style.transform = `translate(${L.bx}px, ${L.by}px)`;
+  let check = '';
+  for (let r = 0; r < P.H; r++) for (let cc = 0; cc < P.W; cc++) if (inR(r, cc) && (r + cc) % 2) check += `M${cc * c} ${r * c}h${c}v${c}h${-c}z`;
+  boardSvg.innerHTML = `<path class="shadow" d="${fill}" transform="translate(5 5)"/><path class="cell" d="${fill}"/><path class="check" d="${check}"/><path class="seams" d="${seams}"/><path class="ghost" d=""/><path class="ghost-edge" d=""/><path class="edge" d="${edge}"/>`;
+  ghostEl = boardSvg.querySelector('.ghost');
+  ghostEdgeEl = boardSvg.querySelector('.ghost-edge');
+}
+function drawGhost(p, snap) {
+  if (!ghostEl) return;
+  if (!p || !snap) { ghostEl.setAttribute('d', ''); if (ghostEdgeEl) ghostEdgeEl.setAttribute('d', ''); return; }
+  const c = L.cell;
+  const set = new Set(p.cells.map(([r, cc]) => r * 16 + cc));
+  const has = (r, cc) => r >= 0 && cc >= 0 && set.has(r * 16 + cc);
+  let d = '', e = '';
+  for (const [r, cc] of p.cells) {
+    const x = (snap.ac + cc) * c, y = (snap.ar + r) * c;
+    d += `M${x} ${y}h${c}v${c}h${-c}z`;
+    if (!has(r - 1, cc)) e += `M${x} ${y}h${c}`;
+    if (!has(r + 1, cc)) e += `M${x} ${y + c}h${c}`;
+    if (!has(r, cc - 1)) e += `M${x} ${y}v${c}`;
+    if (!has(r, cc + 1)) e += `M${x + c} ${y}v${c}`;
+  }
+  ghostEl.style.fill = `var(--p${p.color})`;
+  ghostEl.setAttribute('d', d);
+  if (ghostEdgeEl) ghostEdgeEl.setAttribute('d', e);
+}
+function placeOverlay() {
+  const useTray = overlayAnchor === 'tray' && L;
+  overlay.classList.toggle('is-bottom', !!(useTray && !L.wide));
+  if (useTray && L.wide) {
+    Object.assign(overlay.style, { left: `${L.tray.x}px`, top: '0px', width: `${L.tray.w}px`, height: '100%' });
+  } else {
+    Object.assign(overlay.style, { left: '0px', top: '0px', width: '100%', height: '100%' });
+  }
+}
+
+/* ---------- Plateau : pose et retrait ---------- */
+function fits(cells, ar, ac, self) {
+  const P = S.puzzle;
+  for (const [r, c] of cells) {
+    const rr = ar + r, cc = ac + c;
+    if (rr < 0 || cc < 0 || rr >= P.H || cc >= P.W) return false;
+    const v = S.occ[rr * P.W + cc];
+    if (v === -2 || (v >= 0 && v !== self)) return false;
+  }
+  return true;
+}
+function updateBoardLabel() {
+  if (!S.puzzle) return;
+  const left = S.area - S.covered;
+  boardLabel.textContent = `${S.puzzle.name || 'Forme'} · ${S.area} cases` + (left > 0 && left < S.area ? ` · reste ${left}` : left === 0 ? ' · complet' : '');
+  if (S.phase === 'playing') btnClear.disabled = !S.placeOrder.length;
+}
+function clearBoard() {
+  if (S.phase !== 'playing' || S.busy || !S.placeOrder.length) return;
+  cancelDrag();
+  const n = S.placeOrder.length;
+  for (const i of S.placeOrder.slice()) returnToTray(S.pieces[i]);
+  S.counters.lifts += n;
+  toast(`${plural(n, 'pièce retirée', 'pièces retirées')}.`, 1400);
+}
+function place(p, ar, ac) {
+  const P = S.puzzle;
+  if (p.placed) unplace(p);
+  for (const [r, c] of p.cells) S.occ[(ar + r) * P.W + ac + c] = p.i;
+  p.placed = true; p.ar = ar; p.ac = ac;
+  S.covered += p.size;
+  S.placeOrder = S.placeOrder.filter((i) => i !== p.i);
+  S.placeOrder.push(p.i);
+  p.el.classList.add('is-placed');
+  positionPiece(p);
+  updateBoardLabel();
+}
+function unplace(p) {
+  if (!p.placed) return;
+  const P = S.puzzle;
+  for (const [r, c] of p.cells) {
+    const idx = (p.ar + r) * P.W + p.ac + c;
+    if (S.occ[idx] === p.i) S.occ[idx] = -1;
+  }
+  p.placed = false;
+  S.covered -= p.size;
+  S.placeOrder = S.placeOrder.filter((i) => i !== p.i);
+  p.el.classList.remove('is-placed');
+  updateBoardLabel();
+}
+function returnToTray(p) {
+  unplace(p);
+  p.el.classList.add('is-flying');
+  positionPiece(p);
+  setTimeout(() => p.el.classList.remove('is-flying'), 260);
+}
+/* ---------- Glisser-déposer ---------- */
+function localPoint(e) {
+  const r = stage.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+function nearestCell(p, x, y) {
+  const cs = L.cell * p.s;
+  let best = 0, bd = Infinity;
+  p.cells.forEach(([r, c], k) => {
+    const d = (p.x + (c + 0.5) * cs - x) ** 2 + (p.y + (r + 0.5) * cs - y) ** 2;
+    if (d < bd) { bd = d; best = k; }
+  });
+  return best;
+}
+function hitTest(x, y) {
+  const P = S.puzzle;
+  const c = Math.floor((x - L.bx) / L.cell), r = Math.floor((y - L.by) / L.cell);
+  if (r >= 0 && c >= 0 && r < P.H && c < P.W) {
+    const v = S.occ[r * P.W + c];
+    if (v >= 0) {
+      const p = S.pieces[v];
+      const k = p.cells.findIndex(([cr, cc]) => p.ar + cr === r && p.ac + cc === c);
+      return { p, k: k < 0 ? 0 : k };
+    }
+  }
+  for (const p of S.pieces) {
+    if (p.placed) continue;
+    const slot = L.slots[L.slotOf[p.i]];
+    if (!slot) continue;
+    if (Math.abs(x - slot.cx) <= slot.sw / 2 + L.gap / 2 && Math.abs(y - slot.cy) <= slot.sh / 2 + L.gap / 2) {
+      return { p, k: nearestCell(p, x, y) };
+    }
+  }
+  return null;
+}
+function findSnap(p, x, y) {
+  const fr = (y - L.by) / L.cell, fc = (x - L.bx) / L.cell;
+  const r0 = Math.round(fr), c0 = Math.round(fc);
+  let best = null, bd = Infinity;
+  for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+    const ar = r0 + dr, ac = c0 + dc;
+    const d = (ar - fr) ** 2 + (ac - fc) ** 2;
+    if (d >= bd || d > 0.85) continue;
+    if (fits(p.cells, ar, ac, p.i)) { best = { ar, ac }; bd = d; }
+  }
+  return best;
+}
+function onDown(e) {
+  if (S.phase !== 'playing' || S.busy || drag || !L) return;
+  if (e.target.closest && e.target.closest('.overlay')) return;
+  if (e.button === 1 || e.button === 2) return;
+  const pt = localPoint(e);
+  const hit = hitTest(pt.x, pt.y);
+  if (!hit) return;
+  e.preventDefault();
+  const p = hit.p;
+  const cs = L.cell * p.s;
+  const [cr, cc] = p.cells[hit.k];
+  const inCell = (f) => (f >= 0 && f <= 1 ? f : 0.5);
+  drag = {
+    p, k: hit.k, id: e.pointerId, sx: pt.x, sy: pt.y, px: pt.x, py: pt.y, moved: false,
+    touch: e.pointerType === 'touch', lift: 0,
+    fx: inCell((pt.x - p.x) / cs - cc), fy: inCell((pt.y - p.y) / cs - cr), snap: null,
+  };
+  try { stage.setPointerCapture(e.pointerId); } catch (err) { /* sans capture */ }
+}
+function onMove(e) {
+  if (!drag) {
+    if (e.pointerType === 'mouse' && S.phase === 'playing' && L) {
+      const pt = localPoint(e);
+      stage.classList.toggle('is-grab', !!hitTest(pt.x, pt.y));
+    }
+    return;
+  }
+  if (e.pointerId !== drag.id) return;
+  const pt = localPoint(e);
+  drag.px = pt.x; drag.py = pt.y;
+  if (!drag.moved) {
+    if (Math.hypot(pt.x - drag.sx, pt.y - drag.sy) < (drag.touch ? 9 : 4)) return;
+    const p = drag.p;
+    drag.moved = true;
+    if (p.placed) { unplace(p); S.counters.lifts++; }
+    drag.lift = drag.touch ? Math.max(30, L.cell * 1.15) : 0;
+    p.el.classList.add('is-dragging');
+  }
+  moveDragged();
+}
+function moveDragged() {
+  const p = drag.p, c = L.cell;
+  const [cr, cc] = p.cells[drag.k] || p.cells[0];
+  const x = drag.px - (cc + drag.fx) * c;
+  const y = drag.py - (cr + drag.fy) * c - drag.lift;
+  setPos(p, x, y, 1);
+  const before = drag.snap;
+  drag.snap = findSnap(p, x, y);
+  p.el.classList.toggle('can-drop', !!drag.snap);
+  if (drag.snap && (!before || before.ar !== drag.snap.ar || before.ac !== drag.snap.ac)) buzz(6);
+  drawGhost(p, drag.snap);
+}
+function onUp(e) {
+  if (!drag || e.pointerId !== drag.id) return;
+  const d = drag;
+  drag = null;
+  try { stage.releasePointerCapture(e.pointerId); } catch (err) { /* déjà relâché */ }
+  const p = d.p;
+  if (!d.moved) {
+    // un simple clic sur une pièce posée la renvoie dans la réserve
+    if (p.placed) { S.counters.lifts++; returnToTray(p); }
+    return;
+  }
+  p.el.classList.remove('is-dragging', 'can-drop');
+  drawGhost(null);
+  if (d.snap) {
+    S.counters.drops++;
+    place(p, d.snap.ar, d.snap.ac);
+    replay(p.el, 'bump');
+    buzz(14);
+    checkWin();
+  } else {
+    returnToTray(p);
+  }
+}
+function cancelDrag() {
+  const d = drag;
+  drag = null;
+  if (!d) return;
+  d.p.el.classList.remove('is-dragging', 'can-drop');
+  drawGhost(null);
+  if (d.moved) returnToTray(d.p);
+}
+stage.addEventListener('pointerdown', onDown);
+stage.addEventListener('pointermove', onMove);
+stage.addEventListener('pointerup', onUp);
+stage.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.id) cancelDrag(); });
+stage.addEventListener('contextmenu', (e) => e.preventDefault());
+/* ---------- Chrono ---------- */
+function elapsedNow() { return now() - S.startedAt + S.penalty; }
+function renderClock(left) {
+  left = Math.max(0, left);
+  const txt = fmt(Math.ceil(left / 1000) * 1000);
+  if (timeEl.textContent !== txt) timeEl.textContent = txt;
+  sandFill.style.transform = `scaleX(${left / S.limit})`;
+  const low = left <= 60000;
+  timeEl.classList.toggle('is-low', low);
+  sandEl.classList.toggle('is-low', low);
+  timeEl.classList.toggle('is-critical', S.phase === 'playing' && left <= 10000 && left > 0);
+}
+function tick() {
+  cancelAnimationFrame(rafId);
+  if (S.phase !== 'playing') return;
+  const left = S.limit - elapsedNow();
+  renderClock(left);
+  if (left <= 0) { onTimeout(); return; }
+  rafId = requestAnimationFrame(tick);
+}
+
+/* ---------- Déroulé d'une partie ---------- */
+function resetRun() {
+  cancelAnimationFrame(rafId);
+  cancelDrag();
+  S.penalty = 0; S.hints = 0; S.skips = 0; S.sprintSolved = 0; S.frozenElapsed = 0; S.busy = false;
+}
+function enterGame() {
+  S.view = 'game';
+  menuEl.hidden = true;
+  hudEl.hidden = false;
+  table.hidden = false;
+}
+function prepare(seed) {
+  resetRun();
+  enterGame();
+  S.limit = S.dur;
+  S.phase = 'ready';
+  S.kind = 'sprint';
+  loadPuzzle(freshPuzzle(S.level, seed));
+  renderClock(S.limit);
+  showReadyCard();
+  updateButtons(); updateMeta(); updateRecords(); updateKeys();
+}
+function openDaily() {
+  resetRun();
+  enterGame();
+  S.kind = 'daily';
+  S.dayKey = dayKey();
+  S.limit = LIMIT_NIV;
+  S.phase = 'ready';
+  loadPuzzle(dailyPuzzle(S.dayKey));
+  renderClock(S.limit);
+  showReadyCard();
+  updateButtons(); updateMeta(); updateRecords(); updateKeys();
+}
+function openLevel(i) {
+  resetRun();
+  enterGame();
+  S.kind = 'level';
+  S.lvl = i;
+  S.limit = LIMIT_NIV;
+  S.phase = 'ready';
+  loadPuzzle(campaignPuzzle(i));
+  renderClock(S.limit);
+  showReadyCard();
+  updateButtons(); updateMeta(); updateRecords(); updateKeys();
+}
+function begin() {
+  hideCard();
+  S.phase = 'playing';
+  S.penalty = 0; S.hints = 0; S.skips = 0; S.sprintSolved = 0; S.busy = false;
+  S.startedAt = now();
+  updateButtons(); updateMeta();
+  tick();
+}
+function checkWin() {
+  if (S.phase !== 'playing' || S.covered !== S.area) return;
+  for (let i = 0; i < S.occ.length; i++) if (S.occ[i] === -1) return;
+  onSolved();
+}
+function celebrate() {
+  boardSvg.classList.add('is-solved');
+  S.placeOrder.forEach((i, n) => replay(S.pieces[i].el, 'pop', n * 45));
+}
+function onSolved() {
+  const t = elapsedNow();
+  celebrate();
+  if (S.mode === 'sprint') {
+    const st = stats[S.level];
+    S.sprintSolved++;
+    st.solved++;
+    saveStats();
+    updateMeta();
+    toast(`Résolu · ${plural(S.sprintSolved, 'puzzle', 'puzzles')} au compteur`, 1300);
+    S.busy = true;
+    setTimeout(() => {
+      S.busy = false;
+      if (S.phase === 'playing' && S.mode === 'sprint') loadPuzzle(freshPuzzle(S.level, newSeed()));
+    }, reduceMotion.matches ? 200 : 680);
+    return;
+  }
+  S.phase = 'solved';
+  S.frozenElapsed = t;
+  cancelAnimationFrame(rafId);
+  renderClock(S.limit - t);
+  buzz([20, 40, 20]);
+  const clean = S.hints === 0;
+  if (S.kind === 'daily') {
+    const key = S.dayKey, prevD = dailyBest(key);
+    const recordD = prevD == null || t < prevD;
+    if (recordD) stats.daily[key] = Math.round(t);
+    logRun({ t: Math.round(t), n: S.pieces.length, d: Date.now(), k: 'defi', h: S.hints });
+    saveStats();
+    updateRecords(); updateButtons();
+    const resD = { t, stars: starsFor(t, S.pieces.length), record: recordD && prevD != null, clean, first: prevD == null };
+    setTimeout(() => { if (S.phase === 'solved') showDailyResult(resD); }, reduceMotion.matches ? 0 : 560);
+    return;
+  }
+  const i = S.lvl, prev = campBest(i);
+  const first = !campDone(i);
+  const record = prev == null || t < prev;
+  if (record) stats.camp2[i] = Math.round(t);
+  if (clean && !stats.clean2.includes(i)) stats.clean2.push(i);
+  logRun({ t: Math.round(t), n: S.pieces.length, d: Date.now(), k: 'niv', i, h: S.hints });
+  saveStats();
+  updateRecords(); updateButtons();
+  const res = {
+    t, stars: starsFor(t, S.pieces.length), record: record && prev != null, clean,
+    unlocked: first && i + 1 < CAMPAIGN.length, finished: first && doneCount() === CAMPAIGN.length,
+  };
+  setTimeout(() => { if (S.phase === 'solved') showLevelResult(res); }, reduceMotion.matches ? 0 : 560);
+}
+function onTimeout() {
+  cancelAnimationFrame(rafId);
+  cancelDrag();
+  S.frozenElapsed = S.limit;
+  if (S.mode === 'sprint') {
+    S.phase = 'over';
+    renderClock(0);
+    const key = sprintKey();
+    const record = S.sprintSolved > 0 && S.sprintSolved > (stats.sprint[key] || 0);
+    if (record) stats.sprint[key] = S.sprintSolved;
+    saveStats();
+    updateRecords();
+    showSprintCard(record);
+  } else {
+    S.phase = 'timeout';
+    renderClock(0);
+    showTimeoutCard();
+  }
+  updateButtons(); updateMeta();
+}
+function solutionFor(fixedPieces) {
+  const fixed = {};
+  for (const p of fixedPieces) fixed[p.i] = { ar: p.ar, ac: p.ac, key: cellsKey(p.cells) };
+  return solve(S.puzzle, fixed, { cap: 1, nodeLimit: 400000 });
+}
+function reveal() {
+  if (S.phase === 'playing') S.frozenElapsed = elapsedNow();
+  cancelAnimationFrame(rafId);
+  cancelDrag();
+  S.phase = 'revealed';
+  hideCard();
+  const puzzleAtReveal = S.puzzle;
+  const res = solutionFor(S.pieces.filter((p) => p.placed));
+  const sol = res.count ? res.solutions[0] : S.puzzle.solution.map((s) => ({ ...s }));
+  for (const p of S.pieces) unplace(p);
+  sol.forEach((s, n) => {
+    const p = S.pieces[s.piece];
+    setTimeout(() => {
+      if (S.phase !== 'revealed' || S.puzzle !== puzzleAtReveal) return;
+      p.rot = s.rot; p.flip = s.flip;
+      refreshShape(p); sizeEl(p);
+      p.el.classList.add('is-flying');
+      place(p, s.ar, s.ac);
+      setTimeout(() => p.el.classList.remove('is-flying'), 260);
+    }, reduceMotion.matches ? 0 : 70 * n);
+  });
+  updateButtons(); updateMeta();
+  const settle = reduceMotion.matches ? 60 : 70 * sol.length + 420;
+  setTimeout(() => { if (S.phase === 'revealed' && S.puzzle === puzzleAtReveal) showRevealCard(); }, settle);
+}
+function giveHint() {
+  if (S.phase !== 'playing' || S.busy) return;
+  if (stats.prefs.noHint) { toast('Mode sans indice activé. Désactive-le dans le menu pour utiliser les indices.', 2600); return; }
+  if (S.limit - elapsedNow() <= HINT_COST + 1000) { toast('Plus assez de temps pour un indice.'); return; }
+  cancelDrag();
+  const placedNow = S.pieces.filter((p) => p.placed);
+  const res = solutionFor(placedNow);
+  S.penalty += HINT_COST;
+  S.hints++;
+  if (!res.count && res.aborted) {
+    // recherche trop longue : on s'appuie sur la solution d'origine
+    const P = S.puzzle;
+    const s = P.solution.find((x) => !S.pieces[x.piece].placed
+      && fits(transform(LIB_BY_KEY[P.pieces[x.piece]].cells, x.rot, x.flip), x.ar, x.ac, x.piece));
+    if (s) {
+      const p = S.pieces[s.piece];
+      p.rot = s.rot; p.flip = s.flip;
+      refreshShape(p); sizeEl(p);
+      place(p, s.ar, s.ac);
+      replay(p.el, 'hinted');
+      toast('Indice : une pièce posée au bon endroit (−30 s).');
+      checkWin();
+    } else if (S.placeOrder.length) {
+      const p = S.pieces[S.placeOrder[S.placeOrder.length - 1]];
+      S.counters.lifts++;
+      returnToTray(p);
+      replay(p.el, 'bad');
+      toast('Indice : cette pièce bloquait, retour à la réserve (−30 s).', 3000);
+    }
+    tick();
+    return;
+  }
+  if (res.count > 0) {
+    const sol = res.solutions[0], P = S.puzzle;
+    let target = null;
+    for (let i = 0; i < S.occ.length && !target; i++) {
+      if (S.occ[i] !== -1) continue;
+      const r = (i / P.W) | 0, c = i % P.W;
+      for (const s of sol) {
+        if (S.pieces[s.piece].placed) continue;
+        const o = orientationsOf(P.pieces[s.piece]).find((x) => x.key === s.key);
+        if (o && o.cells.some(([cr, cc]) => s.ar + cr === r && s.ac + cc === c)) { target = s; break; }
+      }
+    }
+    if (target) {
+      const p = S.pieces[target.piece];
+      p.rot = target.rot; p.flip = target.flip;
+      refreshShape(p); sizeEl(p);
+      p.el.classList.add('is-flying');
+      place(p, target.ar, target.ac);
+      setTimeout(() => p.el.classList.remove('is-flying'), 260);
+      replay(p.el, 'hinted');
+      toast('Indice : une pièce posée au bon endroit (−30 s).');
+      checkWin();
+    }
+  } else {
+    const order = S.placeOrder.slice().reverse().map((i) => S.pieces[i]);
+    let culprits = null;
+    for (const p of order) {
+      if (solutionFor(placedNow.filter((q) => q !== p)).count > 0) { culprits = [p]; break; }
+    }
+    if (!culprits) {
+      culprits = [];
+      const rest = placedNow.slice();
+      for (const p of order) {
+        culprits.push(p);
+        rest.splice(rest.indexOf(p), 1);
+        if (solutionFor(rest).count > 0) break;
+      }
+    }
+    for (const p of culprits) { S.counters.lifts++; returnToTray(p); replay(p.el, 'bad'); }
+    toast(culprits.length === 1
+      ? 'Indice : cette pièce bloquait, retour à la réserve (−30 s).'
+      : `Indice : ${culprits.length} pièces bloquaient, retour à la réserve (−30 s).`, 3000);
+  }
+  tick();
+}
+function skipPuzzle() {
+  if (S.phase !== 'playing' || S.busy) return;
+  cancelDrag();
+  S.penalty += SKIP_COST;
+  S.skips++;
+  toast('Puzzle passé (−15 s).', 1300);
+  loadPuzzle(freshPuzzle(S.level, newSeed()));
+  tick();
+}
+
+/* ---------- Fiches ---------- */
+const cardHead = (eyebrow) => `<div class="card-head"><p class="eyebrow">${eyebrow}</p></div>`;
+const enterHint = () => (coarse.matches ? '' : '<span class="hint-key">ou <kbd>Entrée</kbd></span>');
+function howToList() {
+  if (coarse.matches) {
+    return '<li><b>Glisser</b> une pièce sur la forme pour la poser</li><li><b>Toucher</b> une pièce posée : retour à la réserve</li>';
+  }
+  return '<li><b>Glisser</b> une pièce sur la forme pour la poser</li><li><b>Clic</b> sur une pièce posée : retour à la réserve</li><li><kbd>H</kbd> : indice</li>';
+}
+function showCard(html, anchor) {
+  card.innerHTML = html;
+  overlayAnchor = anchor;
+  overlay.hidden = false;
+  placeOverlay();
+  const b = card.querySelector('[data-primary]');
+  if (b && !coarse.matches) b.focus({ preventScroll: true });
+}
+function hideCard() {
+  overlay.hidden = true;
+  card.innerHTML = '';
+  table.classList.remove('is-veiled');
+}
+function durSeg() {
+  return `<div class="seg seg-dur" role="group" aria-label="Durée du sprint">`
+    + DURS.map((d) => `<button type="button" data-dur="${d}" aria-pressed="${d === S.dur}">${d / 60000} min</button>`).join('')
+    + '</div>';
+}
+function goalsList(n) {
+  return '<ul class="goals">'
+    + `<li>${starsSvg(3, 'md')}<span>en moins de ${fmt(n * PAR3)}</span></li>`
+    + `<li>${starsSvg(2, 'md')}<span>en moins de ${fmt(n * PAR2)}</span></li>`
+    + `<li>${starsSvg(1, 'md')}<span>avant ${fmt(LIMIT_NIV)}</span></li></ul>`;
+}
+function showReadyCard() {
+  let html;
+  if (S.mode === 'sprint') {
+    const lv = LEVELS[S.level].label, best = sprintBest(), mins = S.dur / 60000;
+    html = cardHead(`Sprint · ${lv}`)
+      + `<div class="card-body"><h2 id="cardTitle">Un maximum de puzzles en ${mins}&#8239;minutes</h2>`
+      + '<p>Chaque forme remplie en lance une autre. Les pièces gardent leur orientation. Passer coûte 15&#8239;s, un indice 30&#8239;s.</p>'
+      + `<ul class="howto">${howToList()}</ul>`
+      + `<p class="muted">${best ? `Record à battre : ${plural(best, 'puzzle', 'puzzles')} en ${mins}&#8239;min` : `Pas encore de record en ${mins}&#8239;min`}</p>`
+      + `</div><div class="card-foot"><div class="foot-row"><span>Durée</span>${durSeg()}</div>`
+      + `<button type="button" class="btn primary" data-act="start" data-primary>Lancer le sprint</button>${enterHint()}</div>`;
+  } else if (S.kind === 'daily') {
+    const n = S.pieces.length, best = dailyBest(S.dayKey);
+    const d = new Date();
+    html = cardHead(`Défi du jour · ${d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}`)
+      + `<div class="card-body"><h2 id="cardTitle">Remplir la forme avec les ${n} pièces</h2>`
+      + `<p>${S.area} cases, 5&#8239;minutes. La même forme pour tout le monde aujourd'hui, une nouvelle demain.</p>`
+      + goalsList(n)
+      + (best != null ? `<p class="muted">Déjà réussi aujourd'hui en ${fmtPrecise(best)} · ${plural(starsFor(best, n), 'étoile', 'étoiles')}</p>` : '')
+      + (stats.prefs.noHint ? '<p class="muted">Mode sans indice activé.</p>' : '')
+      + '</div><div class="card-foot"><button type="button" class="btn primary" data-act="start" data-primary>Lancer le chrono</button>'
+      + `<button type="button" class="btn" data-act="menu">Niveaux</button>${enterHint()}</div>`;
+  } else {
+    const i = S.lvl, n = S.pieces.length, best = campBest(i);
+    html = cardHead(`Niveau ${i + 1} / ${CAMPAIGN.length} · Série ${Math.floor(i / 10) + 1}`)
+      + `<div class="card-body"><h2 id="cardTitle">Remplir la forme avec les ${n} pièces</h2>`
+      + `<p>${S.area} cases, 5&#8239;minutes. Les pièces gardent leur orientation.</p>`
+      + goalsList(n)
+      + (best != null ? `<p class="muted">Ton record : ${fmtPrecise(best)} · ${plural(campStars(i), 'étoile', 'étoiles')}</p>`
+        : campDone(i) ? '<p class="muted">Déjà réussie · temps non enregistré, rejoue-la pour gagner des étoiles</p>' : '')
+      + (doneCount() < 2 ? `<ul class="howto">${howToList()}</ul>` : '')
+      + (stats.prefs.noHint ? '<p class="muted">Mode sans indice activé.</p>' : '')
+      + '</div><div class="card-foot"><button type="button" class="btn primary" data-act="start" data-primary>Lancer le chrono</button>'
+      + `<button type="button" class="btn" data-act="menu">Niveaux</button>${enterHint()}</div>`;
+  }
+  table.classList.add('is-veiled');
+  showCard(html, 'full');
+}
+function showLevelResult(res) {
+  const i = S.lvl, c = S.counters, n = S.pieces.length;
+  const parts = [plural(c.drops, 'pose', 'poses'), plural(c.lifts, 'reprise', 'reprises')];
+  if (S.hints) parts.push(`${plural(S.hints, 'indice', 'indices')} (+${S.hints * 30}&#8239;s)`);
+  const goal = res.stars >= 3
+    ? 'Trois étoiles sur cette forme.'
+    : `Étoile suivante : moins de ${fmt(n * (res.stars === 2 ? PAR3 : PAR2))}`;
+  let extra = '';
+  if (res.unlocked) extra += `<p><b>Niveau ${i + 2} débloqué.</b></p>`;
+  if (res.finished) extra += `<p><b>Les ${CAMPAIGN.length} formes sont faites.</b> Il reste les étoiles à aller chercher.</p>`;
+  const hasNext = i + 1 < CAMPAIGN.length;
+  const html = cardHead(`Réussi · Niveau ${i + 1} · ${n} pièces`)
+    + `<div class="card-body"><h2 id="cardTitle" class="result"><span class="big">${fmtPrecise(res.t)}</span>${res.record ? '<span class="stamp">Record</span>' : ''}${res.clean ? '<span class="stamp is-clean">Sans indice</span>' : ''}</h2>`
+    + `<p class="star-line">${starsSvg(res.stars, 'lg')}</p>`
+    + `<p>${parts.join(' · ')}</p>`
+    + `<p class="muted">${goal}</p>`
+    + extra
+    + '</div><div class="card-foot">'
+    + (hasNext ? '<button type="button" class="btn primary" data-act="nextlvl" data-primary>Niveau suivant</button>' : '')
+    + `<button type="button" class="btn${hasNext ? '' : ' primary'}" data-act="replay"${hasNext ? '' : ' data-primary'}>Rejouer</button>`
+    + '<button type="button" class="btn" data-act="menu">Niveaux</button></div>';
+  showCard(html, 'tray');
+}
+function showDailyResult(res) {
+  const n = S.pieces.length, c = S.counters;
+  const parts = [plural(c.drops, 'pose', 'poses'), plural(c.lifts, 'reprise', 'reprises')];
+  if (S.hints) parts.push(`${plural(S.hints, 'indice', 'indices')} (+${S.hints * 30}&#8239;s)`);
+  const goal = res.stars >= 3 ? 'Trois étoiles sur le défi du jour.' : `Étoile suivante : moins de ${fmt(n * (res.stars === 2 ? PAR3 : PAR2))}`;
+  const days = Object.keys(stats.daily).length;
+  const html = cardHead('Défi du jour réussi')
+    + `<div class="card-body"><h2 id="cardTitle" class="result"><span class="big">${fmtPrecise(res.t)}</span>${res.record ? '<span class="stamp">Record</span>' : ''}${res.clean ? '<span class="stamp is-clean">Sans indice</span>' : ''}</h2>`
+    + `<p class="star-line">${starsSvg(res.stars, 'lg')}</p>`
+    + `<p>${parts.join(' · ')}</p>`
+    + `<p class="muted">${goal}</p>`
+    + `<p class="muted">${plural(days, 'défi réussi', 'défis réussis')} au total. Nouvelle forme demain.</p>`
+    + '</div><div class="card-foot"><button type="button" class="btn primary" data-act="menu" data-primary>Niveaux</button>'
+    + '<button type="button" class="btn" data-act="replay">Rejouer</button></div>';
+  showCard(html, 'tray');
+}
+function showTimeoutCard() {
+  const placed = S.pieces.filter((p) => p.placed).length, n = S.pieces.length;
+  const html = cardHead(S.kind === 'daily' ? 'Temps écoulé · Défi du jour' : `Temps écoulé · Niveau ${S.lvl + 1}`)
+    + `<div class="card-body"><h2 id="cardTitle">${placed} ${placed > 1 ? 'pièces posées' : 'pièce posée'} sur ${n}</h2>`
+    + '<p>Regarde la solution, puis retente la forme pour la valider.</p></div>'
+    + '<div class="card-foot"><button type="button" class="btn primary" data-act="reveal" data-primary>Voir la solution</button>'
+    + '<button type="button" class="btn" data-act="replay">Réessayer</button>'
+    + '<button type="button" class="btn" data-act="menu">Niveaux</button></div>';
+  showCard(html, 'tray');
+}
+function showRevealCard() {
+  if (S.mode === 'sprint') { toast('Solution affichée.', 2600); return; }
+  const html = cardHead(S.kind === 'daily' ? `Défi du jour · ${S.pieces.length} pièces` : `Niveau ${S.lvl + 1} · ${S.pieces.length} pièces`)
+    + '<div class="card-body"><h2 id="cardTitle">Voici la solution</h2>'
+    + '<p>Repère la place de chaque pièce, puis retente la forme pour la valider.</p></div>'
+    + '<div class="card-foot"><button type="button" class="btn primary" data-act="replay" data-primary>Réessayer</button>'
+    + '<button type="button" class="btn" data-act="menu">Niveaux</button></div>';
+  showCard(html, 'tray');
+}
+function showSprintCard(record) {
+  const best = sprintBest(), mins = S.dur / 60000;
+  const extra = [];
+  if (S.skips) extra.push(plural(S.skips, 'passé', 'passés'));
+  if (S.hints) extra.push(plural(S.hints, 'indice', 'indices'));
+  const html = cardHead(`Sprint terminé · ${LEVELS[S.level].label} · ${mins} min`)
+    + `<div class="card-body"><h2 id="cardTitle" class="result"><span class="big">${S.sprintSolved}<small>${S.sprintSolved > 1 ? 'puzzles résolus' : 'puzzle résolu'}</small></span>${record ? '<span class="stamp">Record</span>' : ''}</h2>`
+    + (extra.length ? `<p>${extra.join(' · ')}</p>` : '')
+    + `<p class="muted">Record : ${plural(best, 'puzzle', 'puzzles')} en ${mins}&#8239;minutes</p></div>`
+    + '<div class="card-foot"><button type="button" class="btn primary" data-act="sprint" data-primary>Rejouer le sprint</button>'
+    + '<button type="button" class="btn" data-act="setup">Changer de durée</button></div>';
+  showCard(html, 'tray');
+}
+card.addEventListener('click', (e) => {
+  const d = e.target.closest('[data-dur]');
+  if (d) {
+    S.dur = Number(d.dataset.dur);
+    if (S.phase === 'ready') { S.limit = S.dur; renderClock(S.limit); }
+    savePrefs();
+    showReadyCard();
+    updateMeta(); updateRecords();
+    return;
+  }
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const act = b.dataset.act;
+  if (act === 'start') begin();
+  else if (act === 'menu') showMenu();
+  else if (act === 'nextlvl') openLevel(Math.min(S.lvl + 1, CAMPAIGN.length - 1));
+  else if (act === 'replay') { if (S.kind === 'daily') openDaily(); else openLevel(S.lvl); begin(); }
+  else if (act === 'reveal') reveal();
+  else if (act === 'sprint') { prepare(newSeed()); begin(); }
+  else if (act === 'setup') prepare(newSeed());
+  else if (act === 'closecard') hideCard();
+  else if (act === 'restore') { const ta = byId('codeIn'); if (importCode(ta ? ta.value : '')) hideCard(); }
+});
+
+/* ---------- Menu des niveaux ---------- */
+const DOT = (r, c) => `M${c + 0.08} ${r + 0.08}h0.84v0.84h-0.84z`;
+function levelArt(i, state) {
+  const P = campaignPuzzle(i);
+  let inner = '';
+  if (state === 'done') {
+    for (const s of P.solution) {
+      let d = '';
+      for (const [r, c] of transform(LIB_BY_KEY[P.pieces[s.piece]].cells, s.rot, s.flip)) d += DOT(s.ar + r, s.ac + c);
+      inner += `<path d="${d}" style="fill: var(--p${P.colors[s.piece]})"/>`;
+    }
+  } else {
+    let d = '';
+    for (let r = 0; r < P.H; r++) for (let c = 0; c < P.W; c++) if (P.region[r * P.W + c]) d += DOT(r, c);
+    inner = `<path class="sil" d="${d}"/>`;
+  }
+  return `<svg class="tile-art" viewBox="-0.4 -0.4 ${P.W + 0.8} ${P.H + 0.8}" aria-hidden="true">${inner}</svg>`;
+}
+function renderMenu() {
+  const done = doneCount(), next = nextLevel();
+  menuDone.textContent = String(done);
+  menuStars.textContent = String(starTotal());
+  menuBar.style.transform = `scaleX(${done / CAMPAIGN.length})`;
+  let html = '';
+  for (let ch = 0; ch * 10 < CAMPAIGN.length; ch++) {
+    const from = ch * 10, to = Math.min(CAMPAIGN.length, from + 10);
+    let chStars = 0, minP = Infinity, maxP = 0, tiles = '';
+    for (let i = from; i < to; i++) {
+      const def = CAMPAIGN[i], n = def.p.length;
+      minP = Math.min(minP, n); maxP = Math.max(maxP, n);
+      const best = campBest(i), st = campStars(i);
+      chStars += st;
+      const state = campDone(i) ? 'done' : isOpen(i) ? 'open' : 'locked';
+      const label = state === 'locked' ? 'verrouillé'
+        : state === 'done' ? `${plural(st, 'étoile', 'étoiles')} sur 3, ${best != null ? `record ${fmtPrecise(best)}` : 'temps non enregistré'}` : 'à jouer';
+      tiles += `<button type="button" class="tile is-${state}${i === next ? ' is-next' : ''}" data-lvl="${i}" title="Niveau ${i + 1} · ${n} pièces" aria-label="Niveau ${i + 1}, ${n} pièces, ${label}"${state === 'locked' ? ' disabled' : ''}>`
+        + `<span class="tile-n">${i + 1}</span>${state === 'locked' ? LOCK_SVG : ''}`
+        + levelArt(i, state)
+        + `<span class="tile-stars">${state === 'locked' ? '' : starsSvg(st)}</span>`
+        + `<span class="tile-name">${n} pièces</span></button>`;
+    }
+    html += `<section class="chapter"><div class="chapter-head"><h3>Série ${ch + 1}</h3>`
+      + `<p class="chapter-meta">Niveaux ${from + 1} à ${to} · ${minP}–${maxP} pièces · ${chStars}/${(to - from) * 3} étoiles</p></div>`
+      + `<div class="tiles">${tiles}</div></section>`;
+  }
+  chaptersEl.innerHTML = html;
+}
+function shapeArt(P, done, cls) {
+  let inner = '';
+  if (done) {
+    for (const s of P.solution) {
+      let d = '';
+      for (const [r, c] of transform(LIB_BY_KEY[P.pieces[s.piece]].cells, s.rot, s.flip)) d += DOT(s.ar + r, s.ac + c);
+      inner += `<path d="${d}" style="fill: var(--p${P.colors[s.piece]})"/>`;
+    }
+  } else {
+    let d = '';
+    for (let r = 0; r < P.H; r++) for (let c = 0; c < P.W; c++) if (P.region[r * P.W + c]) d += DOT(r, c);
+    inner = `<path class="sil" d="${d}"/>`;
+  }
+  return { inner, viewBox: `-0.4 -0.4 ${P.W + 0.8} ${P.H + 0.8}` };
+}
+function renderDaily() {
+  const key = dayKey(), P = dailyPuzzle(key), best = dailyBest(key);
+  const art = shapeArt(P, best != null);
+  dailyArt.setAttribute('viewBox', art.viewBox);
+  dailyArt.innerHTML = art.inner;
+  const days = Object.keys(stats.daily).length;
+  const yesterday = dailyBest(dayKey(new Date(Date.now() - 86400000)));
+  dailyTitle.textContent = `Défi du jour · ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`;
+  if (best != null) {
+    dailyText.innerHTML = `Réussi en <b>${fmtPrecise(best)}</b> · ${starsSvg(starsFor(best, P.pieces.length))} · ${plural(days, 'défi réussi', 'défis réussis')} au total`;
+    btnDaily.textContent = 'Rejouer';
+    btnDaily.classList.remove('primary');
+  } else {
+    dailyText.innerHTML = `${P.pieces.length} pièces, une forme différente chaque jour.` + (days ? ` ${plural(days, 'défi réussi', 'défis réussis')} jusqu'ici${yesterday != null ? ', dont hier' : ''}.` : '');
+    btnDaily.textContent = 'Jouer';
+    btnDaily.classList.add('primary');
+  }
+}
+function renderProgress() {
+  const runs = stats.log.slice(-30);
+  const per = runs.map((e) => e.t / e.n / 1000);
+  const avg = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
+  const recent = per.slice(-10), older = per.slice(-20, -10);
+  const trend = recent.length >= 5 && older.length >= 5 ? avg(recent) - avg(older) : null;
+  const bestPer = per.length ? Math.min(...per) : null;
+  const tiles = [
+    [`${doneCount()}<small>/${CAMPAIGN.length}</small>`, 'formes réussies'],
+    [`${starTotal()}<small>/${CAMPAIGN.length * 3}</small>`, 'étoiles'],
+    [stats.clean2.length, 'formes réussies sans indice'],
+    [Object.keys(stats.daily).length, 'défis du jour réussis'],
+    [recent.length ? `${avg(recent).toFixed(1)}<small>&#8239;s</small>` : '—', 'par pièce, 10 dernières'],
+    [bestPer != null ? `${bestPer.toFixed(1)}<small>&#8239;s</small>` : '—', 'par pièce, meilleure partie'],
+  ];
+  const trendTxt = trend == null ? 'Joue encore quelques formes pour voir ta tendance.'
+    : trend < -0.5 ? `Tu accélères : ${Math.abs(trend).toFixed(1)}&#8239;s de moins par pièce qu'avant.`
+    : trend > 0.5 ? `Tu ralentis un peu : ${trend.toFixed(1)}&#8239;s de plus par pièce qu'avant.` : 'Vitesse stable sur les 20 dernières parties.';
+  // graphique : secondes par pièce, dernières parties ; bandes = seuils d'étoiles (10 s et 20 s par pièce)
+  const W = 640, H = 200, ml = 34, mr = 12, mt = 12, mb = 26;
+  const iw = W - ml - mr, ih = H - mt - mb;
+  const yMax = Math.max(25, Math.ceil((per.length ? Math.max(...per) : 0) / 5) * 5 + 2);
+  const Y = (v) => mt + ih - (Math.min(v, yMax) / yMax) * ih;
+  const X = (k) => ml + (per.length > 1 ? (k / (per.length - 1)) * iw : iw / 2);
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Secondes par pièce sur les ${per.length} dernières parties">`;
+  svg += `<rect class="band" x="${ml}" y="${Y(10)}" width="${iw}" height="${Y(0) - Y(10)}"/>`;
+  svg += `<rect class="band2" x="${ml}" y="${Y(20)}" width="${iw}" height="${Y(10) - Y(20)}"/>`;
+  for (const v of [0, 10, 20, yMax]) {
+    svg += `<line class="grid" x1="${ml}" x2="${ml + iw}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}"/>`;
+    svg += `<text x="${ml - 6}" y="${(Y(v) + 3.5).toFixed(1)}" text-anchor="end">${v}&#8239;s</text>`;
+  }
+  svg += `<text x="${ml + iw}" y="${(Y(10) - 4).toFixed(1)}" text-anchor="end">★★★</text><text x="${ml + iw}" y="${(Y(20) - 4).toFixed(1)}" text-anchor="end">★★</text>`;
+  if (per.length) {
+    svg += `<polyline class="line" points="${per.map((v, k) => `${X(k).toFixed(1)},${Y(v).toFixed(1)}`).join(' ')}"/>`;
+    runs.forEach((e, k) => {
+      const st = starsFor(e.t, e.n);
+      const when = new Date(e.d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      const what = e.k === 'defi' ? 'Défi du jour' : `Niveau ${(e.i | 0) + 1}`;
+      svg += `<circle class="pt s${st}" cx="${X(k).toFixed(1)}" cy="${Y(per[k]).toFixed(1)}" r="4.5"><title>${what} · ${when} · ${fmtPrecise(e.t)} pour ${e.n} pièces (${per[k].toFixed(1)} s/pièce)${e.h ? ` · ${plural(e.h, 'indice', 'indices')}` : ''}</title></circle>`;
+    });
+    svg += `<text x="${ml}" y="${H - 8}">ancienne</text><text x="${ml + iw}" y="${H - 8}" text-anchor="end">dernière</text>`;
+  } else {
+    svg += `<text class="empty" x="${ml + iw / 2}" y="${mt + ih / 2}" text-anchor="middle">Tes parties apparaîtront ici.</text>`;
+  }
+  svg += '</svg>';
+  // formes à améliorer
+  const redo = CAMPAIGN.map((_, i) => i).filter((i) => campDone(i) && campStars(i) < 3)
+    .sort((a, b) => campStars(a) - campStars(b) || (campBest(b) || 0) / CAMPAIGN[b].p.length - (campBest(a) || 0) / CAMPAIGN[a].p.length)
+    .slice(0, 12);
+  const redoHtml = redo.length
+    ? `<div class="redo">${redo.map((i) => `<button type="button" class="redo-btn" data-lvl="${i}">Niveau ${i + 1} ${starsSvg(campStars(i))}<small>${campBest(i) != null ? fmtPrecise(campBest(i)) : '—'}</small></button>`).join('')}</div>`
+    : '<p class="chart-title">Rien à reprendre : toutes les formes réussies ont trois étoiles.</p>';
+  progressEl.innerHTML = `<div class="progress-head"><h3>Ta progression</h3><p class="chart-title">${trendTxt}</p></div>`
+    + `<div class="stat-row">${tiles.map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('')}</div>`
+    + `<div class="chart-wrap"><p class="chart-title">Secondes par pièce, ${per.length ? `${per.length} dernières parties` : 'dernières parties'} · vert : zone trois étoiles, jaune : deux étoiles</p>${svg}</div>`
+    + `<div class="chart-wrap"><p class="chart-title">À améliorer : formes réussies sans les trois étoiles</p>${redoHtml}</div>`;
+}
+function showMenu() {
+  resetRun();
+  S.view = 'menu';
+  S.phase = 'menu';
+  hideCard();
+  table.hidden = true;
+  hudEl.hidden = true;
+  menuEl.hidden = false;
+  renderMenu();
+  renderDaily();
+  if (!progressEl.hidden) renderProgress();
+  syncSettings(); updateRecords(); updateKeys();
+  const next = chaptersEl.querySelector('.is-next');
+  const below = next && progressEl.hidden ? next.offsetTop + next.offsetHeight + 24 - menuEl.clientHeight : 0;
+  menuEl.scrollTop = below > 0 ? below : 0;
+}
+chaptersEl.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-lvl]');
+  if (!b || b.disabled) return;
+  openLevel(Number(b.dataset.lvl));
+});
+progressEl.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-lvl]');
+  if (b) openLevel(Number(b.dataset.lvl));
+});
+btnDaily.addEventListener('click', openDaily);
+byId('btnCopyCode').addEventListener('click', copyCode);
+byId('btnRestoreCode').addEventListener('click', showRestoreCard);
+btnProgress.addEventListener('click', () => {
+  const open = progressEl.hidden;
+  progressEl.hidden = !open;
+  btnProgress.setAttribute('aria-expanded', String(open));
+  stats.prefs.progressOpen = open;
+  saveLocal();
+  if (open) { renderProgress(); progressEl.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' }); }
+});
+noHintEl.addEventListener('change', () => {
+  stats.prefs.noHint = noHintEl.checked;
+  saveLocal();
+  updateButtons();
+  toast(noHintEl.checked ? 'Mode sans indice : le bouton Indice est désactivé.' : 'Indices réactivés (−30 s chacun).', 2200);
+});
+
+/* ---------- Boutons, réglages, clavier ---------- */
+function setIcon(el, name) { if (el.dataset.icon !== name) { el.innerHTML = ICONS[name]; el.dataset.icon = name; } }
+function updateButtons() {
+  const playing = S.phase === 'playing';
+  btnHint.disabled = !playing || !!stats.prefs.noHint;
+  btnHint.title = stats.prefs.noHint ? 'Indices désactivés (mode sans indice)' : 'Indice (H) : coûte 30 s';
+  btnClear.disabled = !playing || !S.placeOrder.length;
+  btnGiveUp.disabled = !playing;
+  if (S.mode === 'sprint') {
+    setIcon(giveUpIcon, 'skip');
+    giveUpLbl.innerHTML = 'Passer <small>−15&#8239;s</small>';
+    btnGiveUp.title = 'Passer ce puzzle : coûte 15 s';
+    btnGiveUp.setAttribute('aria-label', 'Passer ce puzzle, coûte 15 secondes');
+    setIcon(newIcon, 'again');
+    newLbl.textContent = 'Recommencer';
+    btnNew.title = 'Recommencer le sprint';
+    btnNew.setAttribute('aria-label', 'Recommencer le sprint');
+  } else {
+    setIcon(giveUpIcon, 'eye');
+    giveUpLbl.textContent = 'Solution';
+    btnGiveUp.title = 'Abandonner et voir la solution';
+    btnGiveUp.setAttribute('aria-label', 'Abandonner et voir la solution');
+    setIcon(newIcon, 'grid');
+    newLbl.textContent = 'Niveaux';
+    btnNew.title = 'Retour aux niveaux';
+    btnNew.setAttribute('aria-label', 'Retour aux niveaux');
+  }
+  btnNew.classList.toggle('primary', ['revealed', 'solved', 'timeout', 'over'].includes(S.phase));
+}
+function updateMeta() {
+  if (S.mode === 'sprint') clockMeta.textContent = `Sprint · ${LEVELS[S.level].label} · ${S.dur / 60000} min · ${plural(S.sprintSolved, 'résolu', 'résolus')}`;
+  else if (S.kind === 'daily') clockMeta.textContent = `Défi du jour · ${S.pieces.length} pièces`;
+  else clockMeta.textContent = `Niveau ${S.lvl + 1}/${CAMPAIGN.length} · ${CAMPAIGN[S.lvl].p.length} pièces`;
+}
+function updateRecords() {
+  if (S.mode === 'sprint') {
+    const st = stats[S.level];
+    recordsEl.textContent = `${LEVELS[S.level].label} · ${S.dur / 60000} min · record ${plural(sprintBest(), 'puzzle', 'puzzles')} · ${plural(st.solved, 'résolu', 'résolus')} au total`;
+    return;
+  }
+  const head = `${doneCount()}/${CAMPAIGN.length} formes · ${starTotal()}/${CAMPAIGN.length * 3} étoiles`;
+  if (S.view === 'menu') { recordsEl.textContent = head; return; }
+  if (S.kind === 'daily') {
+    const b = dailyBest(S.dayKey);
+    recordsEl.textContent = `Défi du jour · ${b != null ? `réussi en ${fmtPrecise(b)}` : 'pas encore réussi'} · ${head}`;
+    return;
+  }
+  const best = campBest(S.lvl);
+  recordsEl.textContent = `Niveau ${S.lvl + 1} · record ${best != null ? `${fmtPrecise(best)} (${plural(campStars(S.lvl), 'étoile', 'étoiles')})` : campDone(S.lvl) ? 'non enregistré' : '—'} · ${head}`;
+}
+function updateKeys() {
+  if (S.view === 'menu') { keysEl.textContent = 'Clic sur une forme débloquée : la lancer'; return; }
+  keysEl.textContent = coarse.matches
+    ? 'Glisser : poser · Toucher une pièce posée : la retirer'
+    : 'Glisser : poser · Clic sur une pièce posée : la retirer · H : indice · X : tout retirer · Échap : annuler le glisser';
+}
+function syncSettings() {
+  document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === S.mode)));
+  document.querySelectorAll('[data-level]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === S.level)));
+  levelSeg.hidden = S.mode !== 'sprint';
+}
+function savePrefs() { stats.prefs = { mode: S.mode, level: S.level, dur: S.dur }; saveStats(); }
+document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
+  const m = b.dataset.mode;
+  if (m === S.mode) { if (m === 'niveaux' && S.view !== 'menu') showMenu(); return; }
+  S.mode = m;
+  syncSettings(); savePrefs();
+  if (m === 'sprint') prepare(newSeed()); else showMenu();
+}));
+document.querySelectorAll('[data-level]').forEach((b) => b.addEventListener('click', () => {
+  if (S.level === b.dataset.level) return;
+  S.level = b.dataset.level; syncSettings(); savePrefs(); prepare(newSeed());
+}));
+btnHint.addEventListener('click', giveHint);
+btnClear.addEventListener('click', clearBoard);
+btnGiveUp.addEventListener('click', () => { if (S.mode === 'sprint') skipPuzzle(); else if (S.phase === 'playing') reveal(); });
+btnNew.addEventListener('click', () => { if (S.mode === 'sprint') prepare(newSeed()); else showMenu(); });
+window.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const key = e.key.toLowerCase();
+  if (key === 'enter' && !overlay.hidden) {
+    if (document.activeElement && document.activeElement.tagName === 'BUTTON' && card.contains(document.activeElement)) return;
+    if (document.activeElement && document.activeElement.id === 'codeOut') return;
+    const b = card.querySelector('[data-primary]');
+    if (b) { e.preventDefault(); b.click(); }
+    return;
+  }
+  if (S.phase !== 'playing') return;
+  if (key === 'h') { e.preventDefault(); giveHint(); }
+  else if (key === 'x') { e.preventDefault(); clearBoard(); }
+  else if (key === 'escape' && drag) { cancelDrag(); }
+});
+
+let toastHide = 0;
+function toast(msg, ms) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('is-on');
+  clearTimeout(toastHide);
+  toastHide = setTimeout(() => toastEl.classList.remove('is-on'), ms || 2600);
+}
+
+/* ---------- Reprise après une mise à jour de la page ---------- */
+function snapshot() {
+  const base = { v: 4, mode: S.mode, view: S.view, level: S.level, lvl: S.lvl, kind: S.kind, dayKey: S.dayKey, dur: S.dur, phase: S.phase };
+  if (S.view === 'menu' || !S.puzzle) return base;
+  return Object.assign(base, {
+    seed: S.puzzle.seed,
+    pieces: S.pieces.map((p) => ({ rot: p.rot, flip: p.flip, placed: p.placed, ar: p.ar, ac: p.ac })),
+    elapsed: S.phase === 'playing' ? elapsedNow() : S.frozenElapsed,
+    penalty: S.penalty, hints: S.hints, skips: S.skips, sprintSolved: S.sprintSolved, counters: S.counters,
+  });
+}
+function restore(st) {
+  if (!st || st.v !== 4) return false;
+  S.mode = st.mode === 'sprint' ? 'sprint' : 'niveaux';
+  if (LEVELS[st.level]) S.level = st.level;
+  if (DURS.includes(st.dur)) S.dur = st.dur;
+  syncSettings();
+  if (st.view === 'menu' && S.mode === 'niveaux') { showMenu(); return true; }
+  if (!(st.phase === 'playing' || st.phase === 'revealed')) return false;
+  resetRun();
+  enterGame();
+  if (S.mode === 'sprint') {
+    S.kind = 'sprint';
+    S.limit = S.dur;
+    loadPuzzle(freshPuzzle(S.level, st.seed));
+  } else if (st.kind === 'daily' && st.dayKey === dayKey()) {
+    S.kind = 'daily'; S.dayKey = st.dayKey;
+    S.limit = LIMIT_NIV;
+    loadPuzzle(dailyPuzzle(S.dayKey));
+  } else if (st.kind === 'daily') {
+    return false;
+  } else {
+    S.kind = 'level';
+    S.lvl = Math.max(0, Math.min(CAMPAIGN.length - 1, st.lvl | 0));
+    S.limit = LIMIT_NIV;
+    loadPuzzle(campaignPuzzle(S.lvl));
+  }
+  (st.pieces || []).forEach((q, i) => { const p = S.pieces[i]; if (p && q.placed && fits(p.cells, q.ar, q.ac, p.i)) place(p, q.ar, q.ac); });
+  S.penalty = st.penalty || 0; S.hints = st.hints || 0; S.skips = st.skips || 0; S.sprintSolved = st.sprintSolved || 0;
+  if (st.counters) S.counters = st.counters;
+  hideCard();
+  layout(true);
+  if (st.phase === 'playing') {
+    S.phase = 'playing';
+    S.startedAt = now() - ((st.elapsed || 0) - S.penalty);
+    tick();
+  } else {
+    S.phase = 'revealed';
+    S.frozenElapsed = st.elapsed || 0;
+    renderClock(S.limit - S.frozenElapsed);
+  }
+  updateButtons(); updateMeta(); updateRecords(); updateKeys();
+  return true;
+}
+
+function boot(data) {
+  const pr = stats.prefs || {};
+  S.mode = pr.mode === 'sprint' ? 'sprint' : 'niveaux';
+  if (pr.level && LEVELS[pr.level]) S.level = pr.level;
+  if (DURS.includes(pr.dur)) S.dur = pr.dur;
+  menuRule.innerHTML = `<span>${starsSvg(3)} 10&#8239;s par pièce</span><span>${starsSvg(2)} 20&#8239;s par pièce</span><span>${starsSvg(1)} avant 5:00</span>`;
+  byId('menuTotal').textContent = String(CAMPAIGN.length);
+  byId('menuStarsTotal').textContent = String(CAMPAIGN.length * 3);
+  noHintEl.checked = !!pr.noHint;
+  if (pr.progressOpen) { progressEl.hidden = false; btnProgress.setAttribute('aria-expanded', 'true'); }
+  syncSettings();
+  updateKeys();
+  if (window.ResizeObserver) new ResizeObserver(() => layout(true)).observe(stage);
+  else window.addEventListener('resize', () => layout(true));
+  if (coarse.addEventListener) coarse.addEventListener('change', updateKeys);
+  setSync('wait');
+  startSync();
+  checkHashCode(400);
+  window.addEventListener('hashchange', () => checkHashCode(0));
+  if (data && data.state && restore(data.state)) return;
+  if (S.mode === 'sprint') prepare(newSeed()); else showMenu();
+}
+try { if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ state: snapshot() })); } catch (e) { /* hors visionneuse */ }
+if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(boot);
+else boot((window.claude && window.claude.hot && window.claude.hot.data) || {});
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+</script>
+</body>
+</html>
